@@ -116,6 +116,7 @@ New Algorithm = looks at the **whole picture**, ensures fair results.
 
 ## 6\. Flow Diagram: How Annotator AI Works
 
+```mermaid
 flowchart TD
     A[Trainer uploads GT file] --> B[Students upload their annotations]
     B --> C[System prepares files for evaluation]
