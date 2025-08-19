@@ -20,6 +20,37 @@ interface PolygonResultsDashboardProps {
 
 const ResultsDisplay = ({ results, imageUrls }: { results: PolygonEvaluationResult[], imageUrls: Map<string, string> }) => {
 
+  const handleDownloadSummaryCsv = () => {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    // Header
+    csvContent += "Student Filename,Score,Avg IoU,Avg Deviation,Avg Polygon Score,Avg Attribute Score,Matched Count,Missed Count,Extra Count,Feedback\r\n";
+
+    results.forEach(result => {
+        const studentFilename = `"${result.studentFilename}"`;
+        const score = result.score;
+        const avgIoU = result.averageIoU.toFixed(3);
+        const avgDeviation = result.averageDeviation.toFixed(1);
+        const avgPolygonScore = result.averagePolygonScore.toFixed(1);
+        const avgAttributeScore = result.averageAttributeScore.toFixed(1);
+        const matchedCount = result.matched.length;
+        const missedCount = result.missed.length;
+        const extraCount = result.extra.length;
+        const feedback = `"${result.feedback.join('. ')}"`;
+
+        const row = [studentFilename, score, avgIoU, avgDeviation, avgPolygonScore, avgAttributeScore, matchedCount, missedCount, extraCount, feedback].join(',');
+        csvContent += row + "\r\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "polygon_batch_evaluation_summary.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   const handleDownloadDetailedCsv = (result: PolygonEvaluationResult) => {
     const escapeCsv = (str: string | number | undefined) => {
         if (str === undefined || str === null) return '""';
@@ -108,7 +139,42 @@ const ResultsDisplay = ({ results, imageUrls }: { results: PolygonEvaluationResu
             Summary and detailed breakdown for each student file.
           </p>
         </div>
+        <Button variant="outline" onClick={handleDownloadSummaryCsv}>
+          <Download className="mr-2 h-4 w-4" /> Download Summary CSV
+        </Button>
       </div>
+
+       <Card className="mb-6">
+            <CardHeader>
+                <CardTitle>Batch Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Student File</TableHead>
+                            <TableHead className="text-right">Score</TableHead>
+                            <TableHead className="text-right">Avg. IoU</TableHead>
+                            <TableHead className="text-right">Avg. Deviation</TableHead>
+                            <TableHead className="text-right">Avg. Polygon Score</TableHead>
+                            <TableHead className="text-right">Avg. Attribute Score</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {results.map((result) => (
+                            <TableRow key={result.studentFilename}>
+                                <TableCell className="font-medium">{result.studentFilename}</TableCell>
+                                <TableCell className="text-right font-bold">{result.score}</TableCell>
+                                <TableCell className="text-right">{(result.averageIoU * 100).toFixed(1)}%</TableCell>
+                                <TableCell className="text-right">{result.averageDeviation.toFixed(1)}%</TableCell>
+                                <TableCell className="text-right">{result.averagePolygonScore.toFixed(1)}%</TableCell>
+                                <TableCell className="text-right">{result.averageAttributeScore.toFixed(1)}%</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
         
         <Accordion type="single" collapsible className="w-full">
             <h3 className="text-2xl mb-2">Detailed Student Results</h3>
