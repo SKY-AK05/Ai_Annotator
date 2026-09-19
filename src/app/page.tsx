@@ -8,9 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { ResultsDashboard } from '@/components/ResultsDashboard';
 import { AnnotatorAiLogo } from '@/components/AnnotatorAiLogo';
 import type { EvaluationResult, FormValues, CocoJson, SelectedAnnotation, Feedback, ScoreOverrides } from '@/lib/types';
-import { evaluateAnnotations, recalculateOverallScore } from '@/lib/evaluator';
-import { parseCvatXml } from '@/lib/cvat-xml-parser';
-import { extractEvalSchema } from '@/ai/flows/extract-eval-schema';
 import type { EvalSchema, EvalSchemaInput } from '@/lib/types';
 import SkeletonAnnotationPage from '@/components/SkeletonAnnotationPage';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -18,7 +15,6 @@ import { Label } from '@/components/ui/label';
 import { BoxSelect, Bone, Spline } from 'lucide-react';
 import PolygonAnnotationPage from '@/components/PolygonAnnotationPage';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { getAnnotationFeedback } from '@/ai/flows/annotation-feedback-flow';
 
 const LOCAL_STORAGE_KEY = 'annotator-ai-score-overrides';
 
@@ -161,8 +157,15 @@ export default function Home() {
 
       setGtFileContent(fileContent);
       setImageUrls(newImageUrls); // Set images extracted from GT zip
-      const schema = await extractEvalSchema({ gtFileContent: fileContent });
-      setEvalSchema(schema);
+      const formData = new FormData();
+      formData.append('gtFileContent', fileContent);
+      const res = await fetch('/api/schema', { method: 'POST', body: formData });
+      if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Failed to extract schema');
+      }
+      const data = await res.json();
+      setEvalSchema(data.schema);
       toast({
         title: "Evaluation Rules Generated",
         description: "The evaluation schema has been extracted from your GT file.",
@@ -193,11 +196,16 @@ export default function Home() {
               for (const match of imageResult.matched) {
                   const cacheKey = `${imageResult.imageId}-${match.gt.id}`;
                   if (!newCache.has(cacheKey)) {
-                      const promise = getAnnotationFeedback({ gt: match.gt, student: match.student })
-                          .then(feedbackResponse => {
+                      const promise = fetch('/api/feedback', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ gt: match.gt, student: match.student })
+                      }).then(async res => {
+                          if (res.ok) {
+                              const feedbackResponse = await res.json();
                               newCache.set(cacheKey, feedbackResponse);
-                          })
-                          .catch(error => {
+                          }
+                      }).catch(error => {
                               console.error(`Failed to prefetch feedback for ${cacheKey}:`, error);
                           });
                       feedbackPromises.push(promise);
@@ -265,107 +273,65 @@ export default function Home() {
         }
         setImageUrls(newImageUrls);
 
-        // Handle ZIP file upload for student files
-        if (studentFileInputs.length === 1 && studentFileInputs[0].name.endsWith('.zip')) {
-            toast({ title: "Processing Student ZIP file...", description: "Extracting submissions." });
-            const zipFile = studentFileInputs[0];
-            const zip = await JSZip.loadAsync(zipFile);
-            const filePromises = [];
+        const formData = new FormData();
+        formData.append('gtFileContent', gtFileContent);
+        formData.append('evalSchema', JSON.stringify(evalSchema));
+        formData.append('toolType', data.toolType);
+        formData.append('scoreOverrides', JSON.stringify(scoreOverrides));
+        for (const file of data.studentFiles) {
+            formData.append('studentFiles', file);
+        }
 
-            for (const filename in zip.files) {
-                const fileInZip = zip.files[filename];
-                if (fileInZip.dir) continue;
-                
-                // Handle nested zips for CVAT batch exports
-                if (filename.endsWith('.zip')) {
-                    const filePromise = async () => {
-                        try {
-                            const nestedZip = await JSZip.loadAsync(await fileInZip.async('blob'));
-                            for (const nestedFilename in nestedZip.files) {
-                                const nestedFile = nestedZip.files[nestedFilename];
-                                if (!nestedFile.dir && (nestedFilename.endsWith('.xml') || nestedFilename.endsWith('.json'))) {
-                                    const content = await nestedFile.async('string');
-                                    return {
-                                        name: filename, // Use the outer zip filename as student identifier
-                                        content: content
-                                    };
-                                }
-                            }
-                        } catch(e) {
-                            console.error(`Skipping corrupted nested zip: ${filename}`, e);
-                            return null;
-                        }
-                        return null;
-                    };
-                    filePromises.push(filePromise());
-                }
-                // Handle regular files at top level
-                else if (filename.endsWith('.xml') || filename.endsWith('.json')) {
-                    const filePromise = fileInZip.async('string').then(content => ({
-                        name: filename,
-                        content: content
-                    }));
-                    filePromises.push(filePromise);
-                }
+        toast({ title: "Uploading to Server...", description: "Evaluating submissions in the background." });
+
+        const res = await fetch('/api/evaluate', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || 'Failed to evaluate annotations');
+        }
+
+        const responseData = await res.json();
+        const jobId = responseData.jobId;
+        
+        toast({ title: "Job Queued", description: "Waiting for background processing..." });
+
+        // Polling loop
+        let isComplete = false;
+        while (!isComplete) {
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Poll every 2 seconds
+            
+            const statusRes = await fetch(`/api/evaluate/status?jobId=${jobId}`);
+            if (!statusRes.ok) {
+                const errData = await statusRes.json();
+                throw new Error(errData.error || 'Failed to poll status');
             }
-            const resolvedFiles = await Promise.all(filePromises);
-            studentFiles = resolvedFiles.filter(f => f !== null) as { name: string, content: string }[];
-        } else {
-            studentFiles = await Promise.all(studentFileInputs.map(async file => ({
-                name: file.name,
-                content: await file.text()
-            })));
-        }
-
-        if (studentFiles.length === 0) {
-            throw new Error("No valid annotation files (.xml or .json) found in the upload. Please check file formats and try again.");
-        }
-
-        let gtAnnotations: CocoJson;
-        const isXmlFile = (content: string) => content.trim().startsWith('<?xml');
-
-        if (data.toolType === 'cvat_xml' || isXmlFile(gtFileContent)) {
-            gtAnnotations = parseCvatXml(gtFileContent);
-        } else {
-            gtAnnotations = JSON.parse(gtFileContent);
-            // Also normalize image file names for COCO JSON
-            gtAnnotations.images.forEach(image => {
-                image.file_name = image.file_name.split('/').pop()!;
-            });
-        }
-
-        for (const studentFile of studentFiles) {
-            const studentFileContent = studentFile.content;
-            let studentAnnotations: CocoJson;
-
-            if (data.toolType === 'cvat_xml' || isXmlFile(studentFileContent)) {
-                studentAnnotations = parseCvatXml(studentFileContent);
+            
+            const statusData = await statusRes.json();
+            
+            if (statusData.status === 'completed') {
+                isComplete = true;
+                const batchResults: EvaluationResult[] = statusData.batchResults;
+                
+                setResults(batchResults);
+                prefetchAndCacheFeedback(batchResults);
+                
+                toast({
+                    title: "Batch Evaluation Complete",
+                    description: `Successfully evaluated ${batchResults.length} student files. Caching feedback...`,
+                });
+            } else if (statusData.status === 'failed') {
+                throw new Error(statusData.error || 'Job failed on the server');
             } else {
-                studentAnnotations = JSON.parse(studentFileContent);
-                // Also normalize image file names for COCO JSON
-                studentAnnotations.images.forEach(image => {
-                    image.file_name = image.file_name.split('/').pop()!;
+                toast({
+                    title: "Evaluating...",
+                    description: `Progress: ${statusData.progress || 0}%`,
                 });
             }
-        
-            const initialResult = evaluateAnnotations(gtAnnotations, evalSchema, studentAnnotations);
-            const finalResult = recalculateOverallScore({
-                 ...initialResult,
-                studentFilename: studentFile.name,
-            }, scoreOverrides);
-
-            batchResults.push(finalResult);
         }
-        
-        setResults(batchResults);
-        
-        // After evaluation, prefetch and cache all feedback
-        prefetchAndCacheFeedback(batchResults);
-
-        toast({
-            title: "Batch Evaluation Complete",
-            description: `Successfully evaluated ${batchResults.length} student files. Caching feedback...`,
-        });
 
     } catch (e) {
       console.error(e);
@@ -391,16 +357,18 @@ export default function Home() {
     }
     setIsGeneratingRules(true);
     try {
-        const input: EvalSchemaInput = { gtFileContent };
-        // User instructions take precedence over pseudocode editing
-        if (instructions.userInstructions) {
-            input.userInstructions = instructions.userInstructions;
-        } else if (instructions.pseudoCode) {
-            input.pseudoCode = instructions.pseudoCode;
-        }
+        const formData = new FormData();
+        formData.append('gtFileContent', gtFileContent);
+        if (instructions.userInstructions) formData.append('userInstructions', instructions.userInstructions);
+        if (instructions.pseudoCode) formData.append('pseudoCode', instructions.pseudoCode);
         
-        const newSchema = await extractEvalSchema(input);
-        setEvalSchema(newSchema);
+        const res = await fetch('/api/schema', { method: 'POST', body: formData });
+        if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || 'Failed to regenerate schema');
+        }
+        const data = await res.json();
+        setEvalSchema(data.schema);
         toast({
             title: "Rules Regenerated",
             description: "The evaluation schema has been updated based on your input.",
@@ -444,8 +412,22 @@ export default function Home() {
 
     if (match) {
         try {
-            const feedbackResponse = await getAnnotationFeedback({ gt: match.gt, student: match.student });
-            setFeedback(feedbackResponse);
+            const res = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gt: match.gt, student: match.student })
+            });
+            if (res.ok) {
+                const feedbackResponse = await res.json();
+                setFeedback(feedbackResponse);
+                setFeedbackCache(prev => {
+                    const newCache = new Map(prev);
+                    newCache.set(cacheKey, feedbackResponse);
+                    return newCache;
+                });
+            } else {
+                console.error("Failed to fetch feedback");
+            }
             // Also update the cache
             setFeedbackCache(prev => new Map(prev).set(cacheKey, feedbackResponse));
         } catch (error) {

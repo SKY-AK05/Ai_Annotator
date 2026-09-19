@@ -73,6 +73,8 @@ function getAnnotationAttribute(annotation: BboxAnnotation | PolygonAnnotation, 
     return annotation.attributes?.[key];
 }
 
+const MAX_MUNKRES_ANNOTATIONS = 250;
+
 function findOptimalMatches(
     gtAnns: BboxAnnotation[],
     studentAnns: BboxAnnotation[],
@@ -82,6 +84,40 @@ function findOptimalMatches(
         return [];
     }
 
+    const matches: { gtIndex: number; studentIndex: number; iou: number }[] = [];
+
+    // Fallback: If annotation count is too high, Munkres (O(N^3)) will hang the thread.
+    // Use a Greedy O(N^2 log N) fallback instead.
+    if (Math.max(gtAnns.length, studentAnns.length) > MAX_MUNKRES_ANNOTATIONS) {
+        console.warn(`[Performance Warning] High annotation count detected (${gtAnns.length} GT, ${studentAnns.length} Student). Falling back to Greedy matching to prevent UI freeze.`);
+        
+        const possibleMatches: { gtIndex: number; studentIndex: number; iou: number }[] = [];
+        for (let i = 0; i < gtAnns.length; i++) {
+            for (let j = 0; j < studentAnns.length; j++) {
+                const iou = calculateIoU(gtAnns[i].bbox, studentAnns[j].bbox);
+                if (iou >= iouThreshold) {
+                    possibleMatches.push({ gtIndex: i, studentIndex: j, iou });
+                }
+            }
+        }
+        
+        // Sort by highest IoU first
+        possibleMatches.sort((a, b) => b.iou - a.iou);
+        
+        const gtUsed = new Set<number>();
+        const studentUsed = new Set<number>();
+        
+        for (const match of possibleMatches) {
+            if (!gtUsed.has(match.gtIndex) && !studentUsed.has(match.studentIndex)) {
+                matches.push(match);
+                gtUsed.add(match.gtIndex);
+                studentUsed.add(match.studentIndex);
+            }
+        }
+        return matches;
+    }
+
+    // Standard Hungarian Algorithm
     const costMatrix = gtAnns.map(gt =>
         studentAnns.map(student => {
             const iou = calculateIoU(gt.bbox, student.bbox);
@@ -92,7 +128,6 @@ function findOptimalMatches(
 
     const assignments = munkres(costMatrix) as [number, number][];
 
-    const matches: { gtIndex: number; studentIndex: number; iou: number }[] = [];
     for (const [gtIndex, studentIndex] of assignments) {
         const cost = costMatrix[gtIndex][studentIndex];
         if (cost < 1_000_000) {
@@ -442,6 +477,8 @@ export function evaluateSkeletons(gtJson: CocoJson, studentJson: CocoJson): Omit
     
     let totalOks = 0;
 
+    // TODO (Stage 2): Move this synchronous evaluation loop to a server-side backend queue 
+    // to prevent blocking the UI thread and to support concurrent users.
     for (const gt of allGtAnnotations) {
         let bestMatch: { student: BboxAnnotation; iou: number } | null = null;
         for (const student of allStudentAnnotations) {

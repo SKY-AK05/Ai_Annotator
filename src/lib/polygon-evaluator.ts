@@ -18,8 +18,30 @@ function calculatePolygonArea(polygon: PolygonType): number {
     return Math.abs(area / 2);
 }
 
+function getPolygonAABB(polygon: PolygonType): [number, number, number, number] {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const point of polygon) {
+        if (point[0] < minX) minX = point[0];
+        if (point[0] > maxX) maxX = point[0];
+        if (point[1] < minY) minY = point[1];
+        if (point[1] > maxY) maxY = point[1];
+    }
+    return [minX, minY, maxX, maxY];
+}
+
+function doAABBsIntersect(aabb1: [number, number, number, number], aabb2: [number, number, number, number]): boolean {
+    return !(aabb1[2] < aabb2[0] || aabb1[0] > aabb2[2] || aabb1[3] < aabb2[1] || aabb1[1] > aabb2[3]);
+}
+
 function calculatePolygonIoU(poly1: PolygonType, poly2: PolygonType): number {
     try {
+        const aabb1 = getPolygonAABB(poly1);
+        const aabb2 = getPolygonAABB(poly2);
+        
+        if (!doAABBsIntersect(aabb1, aabb2)) {
+            return 0; // Fast path: skip full clipping if bounding boxes don't overlap
+        }
+
         const intersection = pc.intersection([poly1], [poly2]);
         if (intersection.length === 0) return 0;
         

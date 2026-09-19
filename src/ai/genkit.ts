@@ -1,24 +1,31 @@
-
-import {genkit, Plugin, isDev, localFileStore} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
-import {config} from 'dotenv';
-
+import { genkit } from 'genkit';
+import { openAI } from 'genkitx-openai';
+import { config } from 'dotenv';
+import { z } from 'zod';
 
 config();
 
-const plugins: Plugin[] = [
-  googleAI({
-    apiVersion: ['v1beta'],
+const plugins = [
+  openAI({
+    apiKey: process.env.AZURE_OPENAI_API_KEY,
+    baseURL: process.env.AZURE_OPENAI_ENDPOINT,
+    models: [
+      {
+        name: 'gpt-5.6-luna',
+        info: {
+          label: 'Azure GPT-5.6 Luna',
+          versions: ['2026-07-09'],
+          supports: {
+            multiturn: true,
+            systemRole: true,
+          }
+        },
+        configSchema: z.unknown()
+      }
+    ]
   }),
 ];
 
-if (isDev) {
-  plugins.push(localFileStore());
-}
-
-
 export const ai = genkit({
   plugins,
-  logLevel: 'debug',
-  enableTracingAndMetrics: true,
 });

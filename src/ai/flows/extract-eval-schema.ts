@@ -94,7 +94,7 @@ const extractEvalSchemaFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const { output } = await extractEvalSchemaPrompt({ ...input }, { model: googleAI.model('gemini-1.5-flash') });
+        const { output } = await extractEvalSchemaPrompt({ ...input }, { model: 'openai/gpt-5.6-luna' });
       
       if (!output) {
         throw new Error("The AI model failed to extract an evaluation schema.");

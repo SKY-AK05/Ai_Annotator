@@ -1,0 +1,28 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VM via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/Ai_Annotator
+            
+            # Pull latest changes from GitHub
+            git pull origin main
+            
+            # Build and restart the containers in the background
+            docker-compose up -d --build
+            
+            # Remove old unused docker images to save space
+            docker image prune -f
