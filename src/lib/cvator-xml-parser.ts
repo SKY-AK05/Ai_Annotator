@@ -26,7 +26,7 @@ export function parseCvatXml(xmlString: string): CocoJson {
         return categoryMap.get(name)!;
     };
 
-    xmlDoc.querySelectorAll("image").forEach(imageNode => {
+    Array.from(xmlDoc.getElementsByTagName("image")).forEach((imageNode: Element) => {
         const imageId = parseInt(imageNode.getAttribute("id") || "0");
         const imageName = imageNode.getAttribute("name") || "";
         const imageWidth = parseInt(imageNode.getAttribute("width") || "0");
@@ -39,7 +39,7 @@ export function parseCvatXml(xmlString: string): CocoJson {
             height: imageHeight
         });
 
-        imageNode.querySelectorAll("box").forEach(boxNode => {
+        Array.from(imageNode.getElementsByTagName("box")).forEach((boxNode: Element) => {
             const label = boxNode.getAttribute("label") || "unknown";
             const xtl = parseFloat(boxNode.getAttribute("xtl") || "0");
             const ytl = parseFloat(boxNode.getAttribute("ytl") || "0");
@@ -59,7 +59,7 @@ export function parseCvatXml(xmlString: string): CocoJson {
                 attributes: {},
             };
             
-            boxNode.querySelectorAll('attribute').forEach(attributeNode => {
+            Array.from(boxNode.getElementsByTagName('attribute')).forEach((attributeNode: Element) => {
                 const attrName = attributeNode.getAttribute('name');
                 const attrValue = attributeNode.textContent || "";
                 if (attrName && annotation.attributes) {

@@ -27,7 +27,7 @@ export function parseCvatXml(xmlString: string): CocoJson {
         return categoryMap.get(name)!;
     };
 
-    xmlDoc.querySelectorAll("image").forEach(imageNode => {
+    Array.from(xmlDoc.getElementsByTagName("image")).forEach((imageNode: Element) => {
         const imageId = parseInt(imageNode.getAttribute("id") || "0", 10);
         let imageName = imageNode.getAttribute("name") || "";
         // Keep only the base filename
@@ -42,7 +42,7 @@ export function parseCvatXml(xmlString: string): CocoJson {
             height: imageHeight
         });
 
-        imageNode.querySelectorAll("box").forEach(boxNode => {
+        Array.from(imageNode.getElementsByTagName("box")).forEach((boxNode: Element) => {
             const label = boxNode.getAttribute("label") || "unknown";
             const xtl = parseFloat(boxNode.getAttribute("xtl") || "0");
             const ytl = parseFloat(boxNode.getAttribute("ytl") || "0");
@@ -56,7 +56,7 @@ export function parseCvatXml(xmlString: string): CocoJson {
             
             const attributes: { [key: string]: string } = { label: label };
 
-            boxNode.querySelectorAll('attribute').forEach(attributeNode => {
+            Array.from(boxNode.getElementsByTagName('attribute')).forEach((attributeNode: Element) => {
                 const attrName = attributeNode.getAttribute('name');
                 const attrValue = attributeNode.textContent || "";
                 if (attrName) {
@@ -108,7 +108,7 @@ export function parseCvatXmlForPolygons(xmlString: string): CocoJson {
         return categoryMap.get(name)!;
     };
     
-    xmlDoc.querySelectorAll("image").forEach(imageNode => {
+    Array.from(xmlDoc.getElementsByTagName("image")).forEach((imageNode: Element) => {
         const imageId = parseInt(imageNode.getAttribute("id") || "0", 10);
         let imageName = imageNode.getAttribute("name") || "";
         imageName = imageName.split('/').pop()!;
@@ -124,7 +124,7 @@ export function parseCvatXmlForPolygons(xmlString: string): CocoJson {
             });
         }
 
-        imageNode.querySelectorAll("polygon").forEach(polyNode => {
+        Array.from(imageNode.getElementsByTagName("polygon")).forEach((polyNode: Element) => {
             const label = polyNode.getAttribute("label") || "unknown";
             const pointsStr = polyNode.getAttribute("points") || "";
             const points: Point[] = pointsStr.split(';').map(p => {
@@ -135,7 +135,7 @@ export function parseCvatXmlForPolygons(xmlString: string): CocoJson {
             const categoryId = getCategoryId(label);
             const attributes: { [key: string]: string } = { label: label };
 
-            polyNode.querySelectorAll('attribute').forEach(attributeNode => {
+            Array.from(polyNode.getElementsByTagName('attribute')).forEach((attributeNode: Element) => {
                 const attrName = attributeNode.getAttribute('name');
                 const attrValue = attributeNode.textContent || "";
                 if (attrName) {
