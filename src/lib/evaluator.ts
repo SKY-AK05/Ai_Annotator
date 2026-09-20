@@ -203,7 +203,9 @@ export function evaluateAnnotations(gtJson: CocoJson, schema: EvalSchema, studen
 
     const gtCategories = new Map((gtJson.categories || []).map(c => [c.id, c.name]));
     const studentCategories = new Map((studentJson.categories || []).map(c => [c.id, c.name]));
+    
     const gtImages = new Map((gtJson.images || []).map(i => [i.id, i.file_name.split('/').pop()!]));
+    const studentImages = new Map((studentJson.images || []).map(i => [i.id, i.file_name.split('/').pop()!]));
 
     const matched: Match[] = [];
     
@@ -215,25 +217,37 @@ export function evaluateAnnotations(gtJson: CocoJson, schema: EvalSchema, studen
     let totalAttributeSimilaritySum = 0;
     let attributeComparisonsCount = 0;
 
-    // Group annotations by image ID
-    const gtAnnsByImage = allGtAnnotations.reduce((acc, ann) => {
-        (acc[ann.image_id] = acc[ann.image_id] || []).push(ann);
+    // Group annotations by image base name instead of internal image ID
+    const gtAnnsByImageName = allGtAnnotations.reduce((acc, ann) => {
+        const imgName = gtImages.get(ann.image_id);
+        if (imgName) {
+            (acc[imgName] = acc[imgName] || []).push(ann);
+        }
         return acc;
-    }, {} as Record<number, BboxAnnotation[]>);
+    }, {} as Record<string, BboxAnnotation[]>);
 
-    const studentAnnsByImage = allStudentAnnotations.reduce((acc, ann) => {
-        (acc[ann.image_id] = acc[ann.image_id] || []).push(ann);
+    const studentAnnsByImageName = allStudentAnnotations.reduce((acc, ann) => {
+        const imgName = studentImages.get(ann.image_id);
+        if (imgName) {
+            (acc[imgName] = acc[imgName] || []).push(ann);
+        }
         return acc;
-    }, {} as Record<number, BboxAnnotation[]>);
+    }, {} as Record<string, BboxAnnotation[]>);
     
-    const imageIds = Object.keys(gtAnnsByImage).map(Number);
+    // We evaluate over all images present in the GT
+    const imageNames = Array.from(new Set(gtImages.values()));
     const image_results: ImageEvaluationResult[] = [];
 
-
-    for (const imageId of imageIds) {
-        const gtAnnotations = gtAnnsByImage[imageId] || [];
-        const studentAnnotations = studentAnnsByImage[imageId] || [];
+    for (const imageName of imageNames) {
+        const gtAnnotations = gtAnnsByImageName[imageName] || [];
+        const studentAnnotations = studentAnnsByImageName[imageName] || [];
         const imageUsedStudentIds = new Set<number>();
+        
+        // Find the corresponding GT image ID for reporting
+        let imageId = -1;
+        for (const [id, name] of gtImages.entries()) {
+            if (name === imageName) { imageId = id; break; }
+        }
 
         const imageMatched: Match[] = [];
 
@@ -352,7 +366,7 @@ export function evaluateAnnotations(gtJson: CocoJson, schema: EvalSchema, studen
         if (imageMatched.length > 0 || imageMissed.length > 0 || imageExtra.length > 0) {
              image_results.push({
                 imageId: imageId,
-                imageName: gtImages.get(imageId) || `Image ID: ${imageId}`,
+                imageName: imageName,
                 matched: imageMatched,
                 missed: imageMissed,
                 extra: imageExtra,
