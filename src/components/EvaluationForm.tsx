@@ -79,8 +79,18 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                         {...gtFileRef}
                         accept=".xml,.json,.zip"
                         onChange={(e) => {
-                            field.onChange(e.target.files);
-                            onGtFileChange(e.target.files?.[0]);
+                            const files = e.target.files;
+                            field.onChange(files);
+                            onGtFileChange(files?.[0]);
+                            
+                            const file = files?.[0];
+                            if (file) {
+                                if (file.name.toLowerCase().endsWith('.xml')) {
+                                    form.setValue('toolType', 'cvat_xml');
+                                } else if (file.name.toLowerCase().endsWith('.json')) {
+                                    form.setValue('toolType', 'bounding_box');
+                                }
+                            }
                         }}
                       />
                     </div>

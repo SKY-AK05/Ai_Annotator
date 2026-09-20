@@ -31,6 +31,7 @@ interface ResultsDashboardProps {
   onAnnotationSelect: (annotation: SelectedAnnotation | null) => void;
   feedback: Feedback | null;
   onScoreOverride: (studentFilename: string, imageId: number, annotationId: number, newScore: number | null) => void;
+  evaluationError?: string | null;
 }
 
 const FeedbackPanel = ({ feedback }: { feedback: Feedback | null }) => {
@@ -476,7 +477,7 @@ const SingleResultDisplay = ({ result, imageUrls, selectedAnnotation, onAnnotati
     );
 };
 
-export function ResultsDashboard({ results, loading, imageUrls, onEvaluate, onGtFileChange, evalSchema, onRuleChange, selectedAnnotation, onAnnotationSelect, feedback, onScoreOverride }: ResultsDashboardProps) {
+export function ResultsDashboard({ results, loading, imageUrls, onEvaluate, onGtFileChange, evalSchema, onRuleChange, selectedAnnotation, onAnnotationSelect, feedback, onScoreOverride, evaluationError }: ResultsDashboardProps) {
   const [openAccordion, setOpenAccordion] = React.useState<string[]>([]);
 
   React.useEffect(() => {
@@ -539,6 +540,12 @@ export function ResultsDashboard({ results, loading, imageUrls, onEvaluate, onGt
                     <FileQuestion className="h-16 w-16 text-muted-foreground mb-4 animate-pulse" />
                     <h3 className="text-xl font-semibold text-foreground">Evaluating...</h3>
                     <p className="text-muted-foreground mt-2">The results will appear here once the evaluation is complete.</p>
+                </div>
+            ) : evaluationError ? (
+                <div className="flex flex-col items-center justify-center text-center p-8 h-full min-h-[300px] border-dashed border-2 border-destructive/50 rounded-md bg-destructive/10">
+                    <XCircle className="h-16 w-16 text-destructive mb-4" />
+                    <h3 className="text-xl font-semibold text-destructive">Evaluation Error</h3>
+                    <p className="text-destructive/80 mt-2 max-w-md">{evaluationError}</p>
                 </div>
             ) : results ? (
                 <ResultsDisplay results={results} imageUrls={imageUrls} selectedAnnotation={selectedAnnotation} onAnnotationSelect={onAnnotationSelect} feedback={feedback} onScoreOverride={onScoreOverride}/>

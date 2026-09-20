@@ -30,6 +30,7 @@ export default function Home() {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [feedbackCache, setFeedbackCache] = useState<Map<string, Feedback>>(new Map());
   const [scoreOverrides, setScoreOverrides] = useState<ScoreOverrides>({});
+  const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -119,6 +120,7 @@ export default function Home() {
     setSelectedAnnotation(null);
     setFeedback(null);
     setFeedbackCache(new Map());
+    setEvaluationError(null);
 
     try {
       let fileContent: string;
@@ -336,11 +338,7 @@ export default function Home() {
     } catch (e) {
       console.error(e);
       const error = e as Error;
-      toast({
-        title: "Evaluation Error",
-        description: `${error.message}. Please check file formats and try again.`,
-        variant: "destructive",
-      });
+      setEvaluationError(`${error.message}. Please check file formats and try again.`);
     } finally {
       setIsLoading(false);
     }
@@ -500,6 +498,7 @@ export default function Home() {
                   onAnnotationSelect={handleAnnotationSelect}
                   feedback={feedback}
                   onScoreOverride={handleScoreOverride}
+                  evaluationError={evaluationError}
               />
           ) : evaluationMode === 'skeleton' ? (
               <SkeletonAnnotationPage />
