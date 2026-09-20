@@ -1,6 +1,7 @@
 
 
 import type { CocoJson, BboxAnnotation, CocoCategory, CocoImage, PolygonAnnotation, Point } from './types';
+import { DOMParser } from '@xmldom/xmldom';
 
 export function parseCvatXml(xmlString: string): CocoJson {
     const parser = new DOMParser();
