@@ -108,24 +108,30 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
 
   const fetchProjectsWithArgs = async (url: string, key: string) => {
     if (!key || !url) {
-        toast({ title: "Configuration Required", description: "Please enter API URL and Key.", variant: "destructive" });
+        toast({ title: "Configuration Required", description: "Please enter API URL and Key." });
         return;
     }
     
     setIsFetchingProjects(true);
     try {
-        const res = await fetch(`${url}/api/projects`, {
-            headers: { 'Authorization': `Token ${key}` }
+        const res = await fetch('/api/cvat/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key })
         });
         
-        if (!res.ok) throw new Error("Failed to fetch projects. Check your API Key.");
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || "Failed to fetch projects. Check your API Key.");
+        }
+        
         const data = await res.json();
         setProjects(data.results || []);
         if (data.results?.length === 0) {
             toast({ title: "No Projects Found", description: "No projects are accessible with this API key." });
         }
     } catch (err: any) {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
+        toast({ title: "Error", description: err.message });
     } finally {
         setIsFetchingProjects(false);
     }
@@ -143,18 +149,24 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
     setIsFetchingTasks(true);
     setSelectedTaskIds(new Set()); // Reset selections
     try {
-        const res = await fetch(`${cvatApiUrl}/api/tasks?project_id=${projectId}`, {
-            headers: { 'Authorization': `Token ${cvatApiKey}` }
+        const res = await fetch('/api/cvat/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cvatApiUrl, cvatApiKey, projectId })
         });
         
-        if (!res.ok) throw new Error("Failed to fetch tasks.");
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || "Failed to fetch tasks.");
+        }
+        
         const data = await res.json();
         setTasks(data.results || []);
         if (data.results?.length === 0) {
             toast({ title: "No Tasks Found", description: "No tasks found in this project." });
         }
     } catch (err: any) {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
+        toast({ title: "Error", description: err.message });
     } finally {
         setIsFetchingTasks(false);
     }
@@ -180,12 +192,12 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (selectedTaskIds.size === 0) {
-        toast({ title: "No Tasks Selected", description: "Please select at least one task to evaluate.", variant: "destructive" });
+        toast({ title: "No Tasks Selected", description: "Please select at least one task to evaluate." });
         return;
     }
     
     if (!cvatApiUrl || !cvatApiKey) {
-        toast({ title: "Configuration Missing", description: "CVAT API URL and Key are required.", variant: "destructive" });
+        toast({ title: "Configuration Missing", description: "CVAT API URL and Key are required." });
         return;
     }
 
