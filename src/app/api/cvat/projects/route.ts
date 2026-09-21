@@ -12,12 +12,13 @@ export async function POST(request: Request) {
         const headers: Record<string, string> = {
             'Authorization': `Bearer ${cvatApiKey}`
         };
-        
+
+        let url = `${cvatApiUrl}/api/projects`;
         if (org) {
-            headers['X-Organization'] = org;
+            url += `?org=${encodeURIComponent(org)}`;
         }
 
-        const res = await fetch(`${cvatApiUrl}/api/projects`, {
+        const res = await fetch(url, {
             headers
         });
 
