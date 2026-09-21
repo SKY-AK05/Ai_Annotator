@@ -3,16 +3,22 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { cvatApiUrl, cvatApiKey, projectId } = body;
+        const { cvatApiUrl, cvatApiKey, projectId, org } = body;
 
         if (!cvatApiUrl || !cvatApiKey || !projectId) {
-            return NextResponse.json({ error: 'Missing CVAT credentials or project ID' }, { status: 400 });
+            return NextResponse.json({ error: 'Missing credentials or project ID' }, { status: 400 });
+        }
+
+        const headers: Record<string, string> = {
+            'Authorization': `Bearer ${cvatApiKey}`
+        };
+        
+        if (org) {
+            headers['X-Organization'] = org;
         }
 
         const res = await fetch(`${cvatApiUrl}/api/tasks?project_id=${projectId}`, {
-            headers: {
-                'Authorization': `Bearer ${cvatApiKey}`
-            }
+            headers
         });
 
         if (!res.ok) {

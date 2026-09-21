@@ -61,11 +61,14 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [isConfigOpen, setIsConfigOpen] = useState(true);
   const [showApiKey, setShowApiKey] = useState(false);
   
-  // Shared Projects
+  // Shared Orgs & Projects
+  const [orgs, setOrgs] = useState<any[]>([]);
+  const [isFetchingOrgs, setIsFetchingOrgs] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
   const [isFetchingProjects, setIsFetchingProjects] = useState(false);
 
   // GT State
+  const [gtSelectedOrgId, setGtSelectedOrgId] = useState<string>('');
   const [gtSelectedProjectId, setGtSelectedProjectId] = useState<string>('');
   const [gtTasks, setGtTasks] = useState<any[]>([]);
   const [gtSelectedTaskIds, setGtSelectedTaskIds] = useState<Set<number>>(new Set());
@@ -74,6 +77,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [gtProjectSearch, setGtProjectSearch] = useState('');
 
   // Student State
+  const [studentSelectedOrgId, setStudentSelectedOrgId] = useState<string>('');
   const [studentSelectedProjectId, setStudentSelectedProjectId] = useState<string>('');
   const [studentTasks, setStudentTasks] = useState<any[]>([]);
   const [studentSelectedTaskIds, setStudentSelectedTaskIds] = useState<Set<number>>(new Set());
@@ -112,7 +116,8 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
 
     if (currentKey && currentUrl) {
         setIsConfigOpen(false);
-        fetchProjectsWithArgs(currentUrl, currentKey);
+        fetchOrgsWithArgs(currentUrl, currentKey);
+        fetchProjectsWithArgs(currentUrl, currentKey, ''); // Initial fetch for personal workspace
     }
   }, []);
 
@@ -120,10 +125,34 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
     localStorage.setItem('cvatApiUrl', cvatApiUrl);
     localStorage.setItem('cvatApiKey', cvatApiKey);
     setIsConfigOpen(false);
-    fetchProjectsWithArgs(cvatApiUrl, cvatApiKey);
+    fetchOrgsWithArgs(cvatApiUrl, cvatApiKey);
+    fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, '');
   };
 
-  const fetchProjectsWithArgs = async (url: string, key: string) => {
+  const fetchOrgsWithArgs = async (url: string, key: string) => {
+    const trimmedKey = key?.trim();
+    if (!trimmedKey || !url) return;
+    
+    setIsFetchingOrgs(true);
+    try {
+        const res = await fetch('/api/cvat/organizations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey })
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            setOrgs(data.results || []);
+        }
+    } catch (err: any) {
+        console.error("Failed to fetch orgs:", err);
+    } finally {
+        setIsFetchingOrgs(false);
+    }
+  };
+
+  const fetchProjectsWithArgs = async (url: string, key: string, org: string) => {
     const trimmedKey = key?.trim();
     if (!trimmedKey || !url) {
         toast({ title: "Configuration Required", description: "Please enter API URL and Key." });
@@ -135,7 +164,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
         const res = await fetch('/api/cvat/projects', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey })
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey, org })
         });
         
         if (!res.ok) {
@@ -155,9 +184,25 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
     }
   };
 
-  const fetchProjects = () => fetchProjectsWithArgs(cvatApiUrl, cvatApiKey);
+  const fetchProjects = (org: string) => fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, org);
+
+  const handleOrgChange = (org: string, target: 'gt' | 'student') => {
+      if (target === 'gt') {
+          setGtSelectedOrgId(org);
+          setGtSelectedProjectId('');
+          setGtTasks([]);
+          setGtSelectedTaskIds(new Set());
+      } else {
+          setStudentSelectedOrgId(org);
+          setStudentSelectedProjectId('');
+          setStudentTasks([]);
+          setStudentSelectedTaskIds(new Set());
+      }
+      fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, org);
+  };
 
   const fetchTasks = async (projectId: string, target: 'gt' | 'student') => {
+    const org = target === 'gt' ? gtSelectedOrgId : studentSelectedOrgId;
     if (target === 'gt') {
         setGtSelectedProjectId(projectId);
         if (!projectId) return setGtTasks([]);
@@ -175,7 +220,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
         const res = await fetch('/api/cvat/tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl, cvatApiKey: trimmedKey, projectId })
+            body: JSON.stringify({ cvatApiUrl, cvatApiKey: trimmedKey, projectId, org })
         });
         
         if (!res.ok) {
@@ -371,8 +416,24 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                         <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style">
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold">Select Organization</Label>
+                                </div>
+                                <Select value={gtSelectedOrgId} onValueChange={(v) => handleOrgChange(v, 'gt')}>
+                                    <SelectTrigger className="h-8 text-xs border-2 border-foreground shadow-hard bg-background">
+                                        <SelectValue placeholder="Personal Workspace" />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        <SelectItem value="" className="text-xs">Personal Workspace</SelectItem>
+                                        {orgs.map(o => (
+                                            <SelectItem key={o.id} value={o.slug} className="text-xs">{o.slug}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
                                     <Label className="text-xs font-bold">Select Project</Label>
-                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={fetchProjects} disabled={isFetchingProjects}>
+                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={() => fetchProjects(gtSelectedOrgId)} disabled={isFetchingProjects}>
                                         {isFetchingProjects ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                                         Refresh
                                     </Button>
@@ -494,8 +555,24 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                         <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style">
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold">Select Organization</Label>
+                                </div>
+                                <Select value={studentSelectedOrgId} onValueChange={(v) => handleOrgChange(v, 'student')}>
+                                    <SelectTrigger className="h-8 text-xs border-2 border-foreground shadow-hard bg-background">
+                                        <SelectValue placeholder="Personal Workspace" />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        <SelectItem value="" className="text-xs">Personal Workspace</SelectItem>
+                                        {orgs.map(o => (
+                                            <SelectItem key={o.id} value={o.slug} className="text-xs">{o.slug}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
                                     <Label className="text-xs font-bold">Select Project</Label>
-                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={fetchProjects} disabled={isFetchingProjects}>
+                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={() => fetchProjects(studentSelectedOrgId)} disabled={isFetchingProjects}>
                                         {isFetchingProjects ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                                         Refresh
                                     </Button>
