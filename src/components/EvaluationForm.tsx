@@ -70,12 +70,14 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [gtTasks, setGtTasks] = useState<any[]>([]);
   const [gtSelectedTaskIds, setGtSelectedTaskIds] = useState<Set<number>>(new Set());
   const [isFetchingGtTasks, setIsFetchingGtTasks] = useState(false);
+  const [gtTaskSearch, setGtTaskSearch] = useState('');
 
   // Student State
   const [studentSelectedProjectId, setStudentSelectedProjectId] = useState<string>('');
   const [studentTasks, setStudentTasks] = useState<any[]>([]);
   const [studentSelectedTaskIds, setStudentSelectedTaskIds] = useState<Set<number>>(new Set());
   const [isFetchingStudentTasks, setIsFetchingStudentTasks] = useState(false);
+  const [studentTaskSearch, setStudentTaskSearch] = useState('');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -406,23 +408,31 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                             No tasks found.
                                         </div>
                                     ) : (
-                                        <div className="max-h-[120px] overflow-y-auto border-2 border-foreground rounded p-1 space-y-1 bg-background shadow-inner">
-                                            {gtTasks.map(task => (
-                                                <div key={task.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-sm">
-                                                    <Checkbox 
-                                                        id={`gt-task-${task.id}`} 
-                                                        checked={gtSelectedTaskIds.has(task.id)}
-                                                        onCheckedChange={() => toggleTaskSelection(task.id, 'gt')}
-                                                        className="h-3 w-3 border-foreground"
-                                                    />
-                                                    <label 
-                                                        htmlFor={`gt-task-${task.id}`}
-                                                        className="text-xs font-medium leading-none cursor-pointer flex-1 truncate"
-                                                    >
-                                                        {task.name} <span className="text-muted-foreground ml-1">({task.id})</span>
-                                                    </label>
-                                                </div>
-                                            ))}
+                                        <div className="space-y-1">
+                                            <Input 
+                                                placeholder="Search tasks..." 
+                                                className="h-7 text-xs border-foreground"
+                                                value={gtTaskSearch}
+                                                onChange={(e) => setGtTaskSearch(e.target.value)}
+                                            />
+                                            <div className="max-h-[120px] overflow-y-auto border-2 border-foreground rounded p-1 space-y-1 bg-background shadow-inner">
+                                                {gtTasks.filter(t => t.name.toLowerCase().includes(gtTaskSearch.toLowerCase())).map(task => (
+                                                    <div key={task.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-sm">
+                                                        <Checkbox 
+                                                            id={`gt-task-${task.id}`} 
+                                                            checked={gtSelectedTaskIds.has(task.id)}
+                                                            onCheckedChange={() => toggleTaskSelection(task.id, 'gt')}
+                                                            className="h-3 w-3 border-foreground"
+                                                        />
+                                                        <label 
+                                                            htmlFor={`gt-task-${task.id}`}
+                                                            className="text-xs font-medium leading-none cursor-pointer flex-1 truncate"
+                                                        >
+                                                            {task.name} <span className="text-muted-foreground ml-1">({task.id})</span>
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -509,23 +519,31 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                             No tasks found.
                                         </div>
                                     ) : (
-                                        <div className="max-h-[120px] overflow-y-auto border-2 border-foreground rounded p-1 space-y-1 bg-background shadow-inner">
-                                            {studentTasks.map(task => (
-                                                <div key={task.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-sm">
-                                                    <Checkbox 
-                                                        id={`student-task-${task.id}`} 
-                                                        checked={studentSelectedTaskIds.has(task.id)}
-                                                        onCheckedChange={() => toggleTaskSelection(task.id, 'student')}
-                                                        className="h-3 w-3 border-foreground"
-                                                    />
-                                                    <label 
-                                                        htmlFor={`student-task-${task.id}`}
-                                                        className="text-xs font-medium leading-none cursor-pointer flex-1 truncate"
-                                                    >
-                                                        {task.name} <span className="text-muted-foreground ml-1">({task.id})</span>
-                                                    </label>
-                                                </div>
-                                            ))}
+                                        <div className="space-y-1">
+                                            <Input 
+                                                placeholder="Search tasks..." 
+                                                className="h-7 text-xs border-foreground"
+                                                value={studentTaskSearch}
+                                                onChange={(e) => setStudentTaskSearch(e.target.value)}
+                                            />
+                                            <div className="max-h-[120px] overflow-y-auto border-2 border-foreground rounded p-1 space-y-1 bg-background shadow-inner">
+                                                {studentTasks.filter(t => t.name.toLowerCase().includes(studentTaskSearch.toLowerCase())).map(task => (
+                                                    <div key={task.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-sm">
+                                                        <Checkbox 
+                                                            id={`student-task-${task.id}`} 
+                                                            checked={studentSelectedTaskIds.has(task.id)}
+                                                            onCheckedChange={() => toggleTaskSelection(task.id, 'student')}
+                                                            className="h-3 w-3 border-foreground"
+                                                        />
+                                                        <label 
+                                                            htmlFor={`student-task-${task.id}`}
+                                                            className="text-xs font-medium leading-none cursor-pointer flex-1 truncate"
+                                                        >
+                                                            {task.name} <span className="text-muted-foreground ml-1">({task.id})</span>
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
