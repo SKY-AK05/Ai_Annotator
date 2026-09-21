@@ -68,7 +68,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [isFetchingProjects, setIsFetchingProjects] = useState(false);
 
   // GT State
-  const [gtSelectedOrgId, setGtSelectedOrgId] = useState<string>('');
+  const [gtSelectedOrgId, setGtSelectedOrgId] = useState<string>('personal');
   const [gtSelectedProjectId, setGtSelectedProjectId] = useState<string>('');
   const [gtTasks, setGtTasks] = useState<any[]>([]);
   const [gtSelectedTaskIds, setGtSelectedTaskIds] = useState<Set<number>>(new Set());
@@ -77,7 +77,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [gtProjectSearch, setGtProjectSearch] = useState('');
 
   // Student State
-  const [studentSelectedOrgId, setStudentSelectedOrgId] = useState<string>('');
+  const [studentSelectedOrgId, setStudentSelectedOrgId] = useState<string>('personal');
   const [studentSelectedProjectId, setStudentSelectedProjectId] = useState<string>('');
   const [studentTasks, setStudentTasks] = useState<any[]>([]);
   const [studentSelectedTaskIds, setStudentSelectedTaskIds] = useState<Set<number>>(new Set());
@@ -184,7 +184,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
     }
   };
 
-  const fetchProjects = (org: string) => fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, org);
+  const fetchProjects = (org: string) => fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, org === 'personal' ? '' : org);
 
   const handleOrgChange = (org: string, target: 'gt' | 'student') => {
       if (target === 'gt') {
@@ -198,11 +198,13 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
           setStudentTasks([]);
           setStudentSelectedTaskIds(new Set());
       }
-      fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, org);
+      const actualOrg = org === 'personal' ? '' : org;
+      fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, actualOrg);
   };
 
   const fetchTasks = async (projectId: string, target: 'gt' | 'student') => {
-    const org = target === 'gt' ? gtSelectedOrgId : studentSelectedOrgId;
+    const rawOrg = target === 'gt' ? gtSelectedOrgId : studentSelectedOrgId;
+    const org = rawOrg === 'personal' ? '' : rawOrg;
     if (target === 'gt') {
         setGtSelectedProjectId(projectId);
         if (!projectId) return setGtTasks([]);
@@ -423,9 +425,9 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                         <SelectValue placeholder="Personal Workspace" />
                                     </SelectTrigger>
                                     <SelectContent className="card-style">
-                                        <SelectItem value="" className="text-xs">Personal Workspace</SelectItem>
+                                        <SelectItem value="personal" className="text-xs">Personal Workspace</SelectItem>
                                         {orgs.map(o => (
-                                            <SelectItem key={o.id} value={o.slug} className="text-xs">{o.slug}</SelectItem>
+                                            <SelectItem key={o.id} value={o.slug || o.id.toString()} className="text-xs">{o.slug || o.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -562,9 +564,9 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                         <SelectValue placeholder="Personal Workspace" />
                                     </SelectTrigger>
                                     <SelectContent className="card-style">
-                                        <SelectItem value="" className="text-xs">Personal Workspace</SelectItem>
+                                        <SelectItem value="personal" className="text-xs">Personal Workspace</SelectItem>
                                         {orgs.map(o => (
-                                            <SelectItem key={o.id} value={o.slug} className="text-xs">{o.slug}</SelectItem>
+                                            <SelectItem key={o.id} value={o.slug || o.id.toString()} className="text-xs">{o.slug || o.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
