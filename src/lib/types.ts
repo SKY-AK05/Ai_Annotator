@@ -1,6 +1,6 @@
 
 
-import type { z } from "zod";
+import { z } from "zod";
 
 const EvalLabelSchema = z.object({
     name: z.string().describe("The name of the object class label, e.g., 'Person' or 'licence_plates'."),
@@ -27,8 +27,12 @@ export type EvalSchemaInput = z.infer<typeof EvalSchemaInputSchema>;
 
 
 export interface FormValues {
-  gtFile: FileList;
-  cvatTaskIds: string;
+  gtSourceMode: 'file' | 'api';
+  studentSourceMode: 'file' | 'api';
+  gtFile?: FileList;
+  gtCvatTaskIds?: string;
+  studentFiles?: FileList;
+  cvatTaskIds?: string;
   cvatApiUrl: string;
   cvatApiKey: string;
   imageFiles?: FileList;

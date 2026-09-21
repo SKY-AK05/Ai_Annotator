@@ -11,28 +11,37 @@ export async function POST(request: Request) {
         const gtFileContent = formData.get('gtFileContent') as string;
         const evalSchemaStr = formData.get('evalSchema') as string;
         const toolType = formData.get('toolType') as string;
-        const cvatTaskIds = formData.get('cvatTaskIds') as string;
+        const cvatTaskIds = formData.get('cvatTaskIds') as string | null;
         const scoreOverridesStr = formData.get('scoreOverrides') as string;
-        const cvatApiUrl = formData.get('cvatApiUrl') as string;
-        const cvatApiKey = formData.get('cvatApiKey') as string;
+        const cvatApiUrl = formData.get('cvatApiUrl') as string | null;
+        const cvatApiKey = formData.get('cvatApiKey') as string | null;
+        const studentFilesData = formData.getAll('studentFiles') as File[];
 
-        if (!gtFileContent || !evalSchemaStr || !cvatTaskIds || !cvatApiUrl || !cvatApiKey) {
+        if (!gtFileContent || !evalSchemaStr) {
             return NextResponse.json({ error: 'Missing required fields for evaluation' }, { status: 400 });
+        }
+        
+        if (studentFilesData.length === 0 && (!cvatTaskIds || !cvatApiUrl || !cvatApiKey)) {
+             return NextResponse.json({ error: 'Missing CVAT API details or Student Files' }, { status: 400 });
         }
 
         const evalSchema = JSON.parse(evalSchemaStr) as EvalSchema;
         const scoreOverrides = scoreOverridesStr ? JSON.parse(scoreOverridesStr) as ScoreOverrides : {};
         
-        const isXmlFile = (content: string) => content.trim().startsWith('<?xml');
-
-        let gtAnnotations: CocoJson;
-        if (toolType === 'cvat_xml' || isXmlFile(gtFileContent)) {
-            gtAnnotations = parseCvatXml(gtFileContent);
-        } else {
-            gtAnnotations = JSON.parse(gtFileContent);
-            gtAnnotations.images.forEach(image => {
-                image.file_name = image.file_name.split('/').pop()!;
-            });
+        let extractedStudentFiles: { name: string, content: string }[] = [];
+        for (const file of studentFilesData) {
+            if (file.name.endsWith('.zip')) {
+                const zip = await JSZip.loadAsync(await file.arrayBuffer());
+                for (const filename in zip.files) {
+                    const fileInZip = zip.files[filename];
+                    if (!fileInZip.dir && (filename.endsWith('.json') || filename.endsWith('.xml'))) {
+                        const content = await fileInZip.async('string');
+                        extractedStudentFiles.push({ name: filename, content });
+                    }
+                }
+            } else {
+                 extractedStudentFiles.push({ name: file.name, content: await file.text() });
+            }
         }
 
         const job = await evaluationQueue.add('evaluateBatch', {
@@ -40,9 +49,10 @@ export async function POST(request: Request) {
             evalSchema,
             toolType,
             scoreOverrides,
-            cvatTaskIds,
-            cvatApiUrl,
-            cvatApiKey
+            cvatTaskIds: cvatTaskIds || '',
+            cvatApiUrl: cvatApiUrl || '',
+            cvatApiKey: cvatApiKey || '',
+            extractedStudentFiles
         });
 
         return NextResponse.json({ jobId: job.id, status: 'queued' });

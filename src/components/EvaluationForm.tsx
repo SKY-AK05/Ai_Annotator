@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -30,12 +29,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import type { FormValues } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
-  gtFile: typeof window === 'undefined' ? z.any() : z.instanceof(FileList).refine((files) => files?.length === 1, "Ground Truth file is required."),
+  gtFile: typeof window === 'undefined' ? z.any() : z.instanceof(FileList).optional(),
+  studentFiles: typeof window === 'undefined' ? z.any() : z.instanceof(FileList).optional(),
   imageFiles: z.any().optional(),
   toolType: z.string({ required_error: 'Please select a tool type.' }),
 });
@@ -50,21 +51,31 @@ interface EvaluationFormProps {
 export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrls }: EvaluationFormProps) {
   const { toast } = useToast();
   
+  // Modes
+  const [gtSourceMode, setGtSourceMode] = useState<'file' | 'api'>('file');
+  const [studentSourceMode, setStudentSourceMode] = useState<'file' | 'api'>('api');
+
   // API Config State
   const [cvatApiUrl, setCvatApiUrl] = useState('https://opencvat-ig.orchvate.com');
-  const [cvatApiKey, setCvatApiKey] = useState('vr7wfCre.nH1E9PmNq9giisIdUVCBdajKerTPFJe7');
+  const [cvatApiKey, setCvatApiKey] = useState('');
   const [isConfigOpen, setIsConfigOpen] = useState(true);
   const [showApiKey, setShowApiKey] = useState(false);
   
-  // Data State
+  // Shared Projects
   const [projects, setProjects] = useState<any[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('');
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<number>>(new Set());
-  
-  // Loading States
   const [isFetchingProjects, setIsFetchingProjects] = useState(false);
-  const [isFetchingTasks, setIsFetchingTasks] = useState(false);
+
+  // GT State
+  const [gtSelectedProjectId, setGtSelectedProjectId] = useState<string>('');
+  const [gtTasks, setGtTasks] = useState<any[]>([]);
+  const [gtSelectedTaskIds, setGtSelectedTaskIds] = useState<Set<number>>(new Set());
+  const [isFetchingGtTasks, setIsFetchingGtTasks] = useState(false);
+
+  // Student State
+  const [studentSelectedProjectId, setStudentSelectedProjectId] = useState<string>('');
+  const [studentTasks, setStudentTasks] = useState<any[]>([]);
+  const [studentSelectedTaskIds, setStudentSelectedTaskIds] = useState<Set<number>>(new Set());
+  const [isFetchingStudentTasks, setIsFetchingStudentTasks] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,6 +85,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   });
 
   const gtFileRef = form.register("gtFile");
+  const studentFilesRef = form.register("studentFiles");
   const imageFileRef = form.register("imageFiles");
   
   const hasImagesFromGt = imageUrls.size > 0;
@@ -141,15 +153,19 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
 
   const fetchProjects = () => fetchProjectsWithArgs(cvatApiUrl, cvatApiKey);
 
-  const fetchTasks = async (projectId: string) => {
-    setSelectedProjectId(projectId);
-    if (!projectId) {
-        setTasks([]);
-        return;
+  const fetchTasks = async (projectId: string, target: 'gt' | 'student') => {
+    if (target === 'gt') {
+        setGtSelectedProjectId(projectId);
+        if (!projectId) return setGtTasks([]);
+        setIsFetchingGtTasks(true);
+        setGtSelectedTaskIds(new Set());
+    } else {
+        setStudentSelectedProjectId(projectId);
+        if (!projectId) return setStudentTasks([]);
+        setIsFetchingStudentTasks(true);
+        setStudentSelectedTaskIds(new Set());
     }
     
-    setIsFetchingTasks(true);
-    setSelectedTaskIds(new Set()); // Reset selections
     try {
         const trimmedKey = cvatApiKey?.trim();
         const res = await fetch('/api/cvat/tasks', {
@@ -164,218 +180,360 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
         }
         
         const data = await res.json();
-        setTasks(data.results || []);
+        
+        if (target === 'gt') {
+            setGtTasks(data.results || []);
+        } else {
+            setStudentTasks(data.results || []);
+        }
+        
         if (data.results?.length === 0) {
-            toast({ title: "No Tasks Found", description: "No tasks found in this project." });
+            toast({ title: "No Tasks Found", description: `No tasks found in this project for ${target}.` });
         }
     } catch (err: any) {
         toast({ title: "Error", description: err.message });
     } finally {
-        setIsFetchingTasks(false);
+        if (target === 'gt') setIsFetchingGtTasks(false);
+        else setIsFetchingStudentTasks(false);
     }
   };
 
-  const toggleTaskSelection = (taskId: number) => {
-      const newSelection = new Set(selectedTaskIds);
+  const toggleTaskSelection = (taskId: number, target: 'gt' | 'student') => {
+      const currentSelection = target === 'gt' ? gtSelectedTaskIds : studentSelectedTaskIds;
+      const setter = target === 'gt' ? setGtSelectedTaskIds : setStudentSelectedTaskIds;
+      
+      const newSelection = new Set(currentSelection);
       if (newSelection.has(taskId)) {
           newSelection.delete(taskId);
       } else {
           newSelection.add(taskId);
       }
-      setSelectedTaskIds(newSelection);
+      setter(newSelection);
   };
 
-  const handleSelectAll = () => {
-      if (selectedTaskIds.size === tasks.length) {
-          setSelectedTaskIds(new Set());
+  const handleSelectAll = (target: 'gt' | 'student') => {
+      const currentTasks = target === 'gt' ? gtTasks : studentTasks;
+      const currentSelection = target === 'gt' ? gtSelectedTaskIds : studentSelectedTaskIds;
+      const setter = target === 'gt' ? setGtSelectedTaskIds : setStudentSelectedTaskIds;
+
+      if (currentSelection.size === currentTasks.length) {
+          setter(new Set());
       } else {
-          setSelectedTaskIds(new Set(tasks.map(t => t.id)));
+          setter(new Set(currentTasks.map(t => t.id)));
       }
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (selectedTaskIds.size === 0) {
-        toast({ title: "No Tasks Selected", description: "Please select at least one task to evaluate." });
+    // Validation
+    if (gtSourceMode === 'file' && (!values.gtFile || values.gtFile.length === 0)) {
+        toast({ title: "Missing Ground Truth", description: "Please upload a Ground Truth file." });
+        return;
+    }
+    if (gtSourceMode === 'api' && gtSelectedTaskIds.size === 0) {
+        toast({ title: "Missing Ground Truth", description: "Please select at least one CVAT task for Ground Truth." });
+        return;
+    }
+    if (studentSourceMode === 'file' && (!values.studentFiles || values.studentFiles.length === 0)) {
+        toast({ title: "Missing Student Data", description: "Please upload at least one Student file." });
+        return;
+    }
+    if (studentSourceMode === 'api' && studentSelectedTaskIds.size === 0) {
+        toast({ title: "Missing Student Data", description: "Please select at least one CVAT task for Student Data." });
         return;
     }
     
-    if (!cvatApiUrl || !cvatApiKey) {
-        toast({ title: "Configuration Missing", description: "CVAT API URL and Key are required." });
+    if ((gtSourceMode === 'api' || studentSourceMode === 'api') && (!cvatApiUrl || !cvatApiKey)) {
+        toast({ title: "Configuration Missing", description: "CVAT API URL and Key are required for API mode." });
         return;
     }
 
     onEvaluate({
-      gtFile: values.gtFile[0],
-      imageFiles: values.imageFiles,
-      cvatTaskIds: Array.from(selectedTaskIds).join(','),
+      gtSourceMode,
+      studentSourceMode,
+      gtFile: values.gtFile,
+      gtCvatTaskIds: Array.from(gtSelectedTaskIds).join(','),
+      studentFiles: values.studentFiles,
+      cvatTaskIds: Array.from(studentSelectedTaskIds).join(','),
       cvatApiUrl,
-      cvatApiKey,
+      cvatApiKey: cvatApiKey.trim(),
+      imageFiles: values.imageFiles,
       toolType: values.toolType,
-    } as any);
+    });
   }
 
   return (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          
+          {/* API Config Collapsible (Global for both GT and Student API) */}
+          <Collapsible open={isConfigOpen} onOpenChange={setIsConfigOpen} className="border-2 border-foreground rounded-md p-3 bg-popover card-style shadow-hard mb-6">
+              <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                      <Settings className="h-4 w-4" /> Global CVAT API Config
+                  </h4>
+                  <CollapsibleTrigger asChild>
+                      <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                          {isConfigOpen ? 'Hide' : 'Edit'}
+                      </Button>
+                  </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent className="space-y-3">
+                  <div className="space-y-1">
+                      <Label htmlFor="cvatApiUrl" className="text-xs font-semibold">API URL</Label>
+                      <Input 
+                          id="cvatApiUrl" 
+                          value={cvatApiUrl} 
+                          onChange={(e) => setCvatApiUrl(e.target.value)} 
+                          placeholder="https://opencvat-ig.orchvate.com"
+                          className="h-8 text-xs border-2 border-foreground shadow-hard"
+                      />
+                  </div>
+                  <div className="space-y-1">
+                      <Label htmlFor="cvatApiKey" className="text-xs font-semibold">API Key</Label>
+                      <div className="relative">
+                        <Input 
+                            id="cvatApiKey" 
+                            type={showApiKey ? "text" : "password"}
+                            value={cvatApiKey} 
+                            onChange={(e) => setCvatApiKey(e.target.value)} 
+                            placeholder="Enter your API token..."
+                            className="h-8 text-xs border-2 border-foreground shadow-hard pr-8"
+                        />
+                        <button 
+                            type="button" 
+                            onClick={() => setShowApiKey(!showApiKey)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                            {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                  </div>
+                  <Button type="button" onClick={saveConfig} variant="secondary" size="sm" className="w-full text-xs font-bold border-2 border-foreground shadow-hard">
+                      Save & Connect
+                  </Button>
+              </CollapsibleContent>
+          </Collapsible>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Ground Truth Upload */}
-            <FormField
-              control={form.control}
-              name="gtFile"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-bold">1. Ground Truth Annotations</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <FileCog className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input
-                        type="file"
-                        className="pl-10"
-                        {...gtFileRef}
-                        accept=".xml,.json,.zip"
-                        onChange={(e) => {
-                            const files = e.target.files;
-                            field.onChange(files);
-                            onGtFileChange(files?.[0]);
-                            
-                            const file = files?.[0];
-                            if (file) {
-                                if (file.name.toLowerCase().endsWith('.xml')) {
-                                    form.setValue('toolType', 'cvat_xml');
-                                } else if (file.name.toLowerCase().endsWith('.json')) {
-                                    form.setValue('toolType', 'bounding_box');
-                                }
-                            }
-                        }}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormDescription>Upload a single JSON, XML, or ZIP file.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Ground Truth Section */}
+            <div className="space-y-3">
+                <Label className="font-bold text-base">1. Ground Truth Annotations</Label>
+                <Tabs value={gtSourceMode} onValueChange={(v: any) => setGtSourceMode(v)} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 border-2 border-foreground shadow-hard h-10">
+                        <TabsTrigger value="file" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Manual Upload</TabsTrigger>
+                        <TabsTrigger value="api" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">CVAT API</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="file" className="mt-3">
+                        <FormField
+                        control={form.control}
+                        name="gtFile"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormControl>
+                                <div className="relative">
+                                <FileCog className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                    type="file"
+                                    className="pl-10 shadow-hard border-2 border-foreground bg-background"
+                                    {...gtFileRef}
+                                    accept=".xml,.json,.zip"
+                                    onChange={(e) => {
+                                        const files = e.target.files;
+                                        field.onChange(files);
+                                        onGtFileChange(files?.[0]);
+                                        
+                                        const file = files?.[0];
+                                        if (file) {
+                                            if (file.name.toLowerCase().endsWith('.xml')) {
+                                                form.setValue('toolType', 'cvat_xml');
+                                            } else if (file.name.toLowerCase().endsWith('.json')) {
+                                                form.setValue('toolType', 'bounding_box');
+                                            }
+                                        }
+                                    }}
+                                />
+                                </div>
+                            </FormControl>
+                            <FormDescription>Upload a single JSON, XML, or ZIP file.</FormDescription>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    </TabsContent>
 
-            {/* CVAT API and Student Selection */}
-            <FormItem>
-              <FormLabel className="font-bold">2. CVAT Student Tasks</FormLabel>
-              
-              <Collapsible open={isConfigOpen} onOpenChange={setIsConfigOpen} className="border-2 border-foreground rounded-md p-3 bg-popover card-style shadow-hard">
-                  <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-bold flex items-center gap-2">
-                          <Settings className="h-4 w-4" /> API Config
-                      </h4>
-                      <CollapsibleTrigger asChild>
-                          <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                              {isConfigOpen ? 'Hide' : 'Edit'}
-                          </Button>
-                      </CollapsibleTrigger>
-                  </div>
-                  <CollapsibleContent className="space-y-3">
-                      <div className="space-y-1">
-                          <Label htmlFor="cvatApiUrl" className="text-xs font-semibold">API URL</Label>
-                          <Input 
-                              id="cvatApiUrl" 
-                              value={cvatApiUrl} 
-                              onChange={(e) => setCvatApiUrl(e.target.value)} 
-                              placeholder="https://opencvat-ig.orchvate.com"
-                              className="h-8 text-xs border-2 border-foreground shadow-hard"
-                          />
-                      </div>
-                      <div className="space-y-1">
-                          <Label htmlFor="cvatApiKey" className="text-xs font-semibold">API Key</Label>
-                          <div className="relative">
-                            <Input 
-                                id="cvatApiKey" 
-                                type={showApiKey ? "text" : "password"}
-                                value={cvatApiKey} 
-                                onChange={(e) => setCvatApiKey(e.target.value)} 
-                                placeholder="Enter your API token..."
-                                className="h-8 text-xs border-2 border-foreground shadow-hard pr-8"
+                    <TabsContent value="api" className="mt-3">
+                        <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style">
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold">Select Project</Label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={fetchProjects} disabled={isFetchingProjects}>
+                                        {isFetchingProjects ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                                        Refresh
+                                    </Button>
+                                </div>
+                                <Select value={gtSelectedProjectId} onValueChange={(v) => fetchTasks(v, 'gt')}>
+                                    <SelectTrigger className="h-8 text-xs border-2 border-foreground shadow-hard bg-background">
+                                        <SelectValue placeholder="Choose a project..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        {projects.map(p => (
+                                            <SelectItem key={p.id} value={p.id.toString()} className="text-xs">{p.name} (ID: {p.id})</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {gtSelectedProjectId && (
+                                <div className="space-y-1.5 pt-1">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-xs font-bold">Select GT Tasks</Label>
+                                        {gtTasks.length > 0 && (
+                                            <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={() => handleSelectAll('gt')}>
+                                                <CheckSquare className="h-3 w-3 mr-1" />
+                                                {gtSelectedTaskIds.size === gtTasks.length ? "Deselect All" : "Select All"}
+                                            </Button>
+                                        )}
+                                    </div>
+                                    
+                                    {isFetchingGtTasks ? (
+                                        <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
+                                            <Loader2 className="h-3 w-3 animate-spin mr-2" /> Fetching tasks...
+                                        </div>
+                                    ) : gtTasks.length === 0 ? (
+                                        <div className="text-xs text-muted-foreground p-2 text-center border rounded bg-muted/20">
+                                            No tasks found.
+                                        </div>
+                                    ) : (
+                                        <div className="max-h-[120px] overflow-y-auto border-2 border-foreground rounded p-1 space-y-1 bg-background shadow-inner">
+                                            {gtTasks.map(task => (
+                                                <div key={task.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-sm">
+                                                    <Checkbox 
+                                                        id={`gt-task-${task.id}`} 
+                                                        checked={gtSelectedTaskIds.has(task.id)}
+                                                        onCheckedChange={() => toggleTaskSelection(task.id, 'gt')}
+                                                        className="h-3 w-3 border-foreground"
+                                                    />
+                                                    <label 
+                                                        htmlFor={`gt-task-${task.id}`}
+                                                        className="text-xs font-medium leading-none cursor-pointer flex-1 truncate"
+                                                    >
+                                                        {task.name} <span className="text-muted-foreground ml-1">({task.id})</span>
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </div>
+
+            {/* Student Data Section */}
+            <div className="space-y-3">
+                <Label className="font-bold text-base">2. Student Annotations</Label>
+                <Tabs value={studentSourceMode} onValueChange={(v: any) => setStudentSourceMode(v)} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 border-2 border-foreground shadow-hard h-10">
+                        <TabsTrigger value="file" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Manual Upload</TabsTrigger>
+                        <TabsTrigger value="api" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">CVAT API</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="file" className="mt-3">
+                         <FormField
+                            control={form.control}
+                            name="studentFiles"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormControl>
+                                    <div className="relative">
+                                    <UploadCloud className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                    <Input
+                                        type="file"
+                                        className="pl-10 shadow-hard border-2 border-foreground bg-background"
+                                        {...studentFilesRef}
+                                        accept=".xml,.json,.zip"
+                                        multiple
+                                    />
+                                    </div>
+                                </FormControl>
+                                <FormDescription>Upload one or more student JSON/XML files or ZIPs.</FormDescription>
+                                <FormMessage />
+                                </FormItem>
+                            )}
                             />
-                            <button 
-                                type="button" 
-                                onClick={() => setShowApiKey(!showApiKey)}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            >
-                                {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </button>
-                          </div>
-                      </div>
-                      <Button type="button" onClick={saveConfig} variant="secondary" size="sm" className="w-full text-xs font-bold border-2 border-foreground shadow-hard">
-                          Save & Connect
-                      </Button>
-                  </CollapsibleContent>
-              </Collapsible>
+                    </TabsContent>
 
-              {!isConfigOpen && (
-                  <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style mt-3">
-                       <div className="space-y-1.5">
-                          <div className="flex items-center justify-between">
-                              <Label className="text-xs font-bold">Select Project</Label>
-                              <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={fetchProjects} disabled={isFetchingProjects}>
-                                  {isFetchingProjects ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-                                  Refresh
-                              </Button>
-                          </div>
-                          <Select value={selectedProjectId} onValueChange={fetchTasks}>
-                              <SelectTrigger className="h-8 text-xs border-2 border-foreground shadow-hard">
-                                  <SelectValue placeholder="Choose a project..." />
-                              </SelectTrigger>
-                              <SelectContent className="card-style">
-                                  {projects.map(p => (
-                                      <SelectItem key={p.id} value={p.id.toString()} className="text-xs">{p.name} (ID: {p.id})</SelectItem>
-                                  ))}
-                              </SelectContent>
-                          </Select>
-                      </div>
+                    <TabsContent value="api" className="mt-3">
+                        <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style">
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold">Select Project</Label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={fetchProjects} disabled={isFetchingProjects}>
+                                        {isFetchingProjects ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                                        Refresh
+                                    </Button>
+                                </div>
+                                <Select value={studentSelectedProjectId} onValueChange={(v) => fetchTasks(v, 'student')}>
+                                    <SelectTrigger className="h-8 text-xs border-2 border-foreground shadow-hard bg-background">
+                                        <SelectValue placeholder="Choose a project..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        {projects.map(p => (
+                                            <SelectItem key={p.id} value={p.id.toString()} className="text-xs">{p.name} (ID: {p.id})</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                      {selectedProjectId && (
-                          <div className="space-y-1.5 pt-1">
-                              <div className="flex items-center justify-between">
-                                  <Label className="text-xs font-bold">Select Tasks / Students</Label>
-                                  {tasks.length > 0 && (
-                                      <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={handleSelectAll}>
-                                          <CheckSquare className="h-3 w-3 mr-1" />
-                                          {selectedTaskIds.size === tasks.length ? "Deselect All" : "Select All"}
-                                      </Button>
-                                  )}
-                              </div>
-                              
-                              {isFetchingTasks ? (
-                                   <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
-                                      <Loader2 className="h-3 w-3 animate-spin mr-2" /> Fetching tasks...
-                                   </div>
-                              ) : tasks.length === 0 ? (
-                                  <div className="text-xs text-muted-foreground p-2 text-center border rounded bg-muted/20">
-                                      No tasks found.
-                                  </div>
-                              ) : (
-                                  <div className="max-h-[120px] overflow-y-auto border-2 border-foreground rounded p-1 space-y-1 bg-background shadow-inner">
-                                      {tasks.map(task => (
-                                          <div key={task.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-sm">
-                                              <Checkbox 
-                                                  id={`task-${task.id}`} 
-                                                  checked={selectedTaskIds.has(task.id)}
-                                                  onCheckedChange={() => toggleTaskSelection(task.id)}
-                                                  className="h-3 w-3 border-foreground"
-                                              />
-                                              <label 
-                                                  htmlFor={`task-${task.id}`}
-                                                  className="text-xs font-medium leading-none cursor-pointer flex-1 truncate"
-                                              >
-                                                  {task.name} <span className="text-muted-foreground ml-1">({task.id})</span>
-                                              </label>
-                                          </div>
-                                      ))}
-                                  </div>
-                              )}
-                          </div>
-                      )}
-                  </div>
-              )}
-            </FormItem>
+                            {studentSelectedProjectId && (
+                                <div className="space-y-1.5 pt-1">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-xs font-bold">Select Student Tasks</Label>
+                                        {studentTasks.length > 0 && (
+                                            <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={() => handleSelectAll('student')}>
+                                                <CheckSquare className="h-3 w-3 mr-1" />
+                                                {studentSelectedTaskIds.size === studentTasks.length ? "Deselect All" : "Select All"}
+                                            </Button>
+                                        )}
+                                    </div>
+                                    
+                                    {isFetchingStudentTasks ? (
+                                        <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
+                                            <Loader2 className="h-3 w-3 animate-spin mr-2" /> Fetching tasks...
+                                        </div>
+                                    ) : studentTasks.length === 0 ? (
+                                        <div className="text-xs text-muted-foreground p-2 text-center border rounded bg-muted/20">
+                                            No tasks found.
+                                        </div>
+                                    ) : (
+                                        <div className="max-h-[120px] overflow-y-auto border-2 border-foreground rounded p-1 space-y-1 bg-background shadow-inner">
+                                            {studentTasks.map(task => (
+                                                <div key={task.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-sm">
+                                                    <Checkbox 
+                                                        id={`student-task-${task.id}`} 
+                                                        checked={studentSelectedTaskIds.has(task.id)}
+                                                        onCheckedChange={() => toggleTaskSelection(task.id, 'student')}
+                                                        className="h-3 w-3 border-foreground"
+                                                    />
+                                                    <label 
+                                                        htmlFor={`student-task-${task.id}`}
+                                                        className="text-xs font-medium leading-none cursor-pointer flex-1 truncate"
+                                                    >
+                                                        {task.name} <span className="text-muted-foreground ml-1">({task.id})</span>
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </div>
 
             {/* Original Images Upload */}
             <FormField
@@ -389,7 +547,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                       <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                       <Input 
                         type="file" 
-                        className="pl-10" 
+                        className="pl-10 shadow-hard border-2 border-foreground bg-background" 
                         {...imageFileRef} 
                         accept="image/*,.zip" 
                         multiple 
@@ -418,7 +576,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                   <FormLabel className="font-bold">Annotation Format</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                      <SelectTrigger className='shadow-hard border-2 border-foreground'>
+                      <SelectTrigger className='shadow-hard border-2 border-foreground bg-background'>
                           <SelectValue placeholder="Select a tool type" />
                       </SelectTrigger>
                       </FormControl>
@@ -436,14 +594,12 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
             />
           </div>
           
-          <Button type="submit" disabled={isLoading} className="w-full font-bold">
+          <Button type="submit" disabled={isLoading} className="w-full font-bold h-12 shadow-hard border-2 border-foreground text-base mt-8">
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 Evaluating...
               </>
-            ) : selectedTaskIds.size > 0 ? (
-              `Pull ${selectedTaskIds.size} Tasks & Run Evaluation`
             ) : (
               'Run Evaluation'
             )}

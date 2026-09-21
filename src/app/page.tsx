@@ -9,6 +9,7 @@ import { ResultsDashboard } from '@/components/ResultsDashboard';
 import { AnnotatorAiLogo } from '@/components/AnnotatorAiLogo';
 import type { EvaluationResult, FormValues, CocoJson, SelectedAnnotation, Feedback, ScoreOverrides } from '@/lib/types';
 import type { EvalSchema, EvalSchemaInput } from '@/lib/types';
+import { recalculateOverallScore } from '@/lib/evaluator';
 import SkeletonAnnotationPage from '@/components/SkeletonAnnotationPage';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -222,22 +223,69 @@ export default function Home() {
   };
 
 
+  const [loadedGtSourceId, setLoadedGtSourceId] = useState<string | null>(null);
+
   const handleEvaluate = async (data: FormValues) => {
-    if (!evalSchema || !gtFileContent) {
-      toast({
-        title: "Evaluation Rules or GT File Missing",
-        description: "Please upload a Ground Truth file first to generate rules and prepare for evaluation.",
-        variant: "destructive",
-      });
-      return;
-    }
     setIsLoading(true);
     setResults(null);
     setSelectedAnnotation(null);
     setFeedback(null);
     setFeedbackCache(new Map());
-  
+    setEvaluationError(null);
+
     try {
+        let currentGtContent = gtFileContent;
+        let currentEvalSchema = evalSchema;
+
+        // If GT is from API and we haven't loaded it yet (or changed it)
+        if (data.gtSourceMode === 'api' && data.gtCvatTaskIds) {
+            const taskId = data.gtCvatTaskIds.split(',')[0]; // Just take the first one for GT
+            if (loadedGtSourceId !== `api-${taskId}`) {
+                toast({ title: "Fetching Ground Truth...", description: "Downloading GT annotations from CVAT." });
+                const exportRes = await fetch('/api/cvat/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cvatApiUrl: data.cvatApiUrl,
+                        cvatApiKey: data.cvatApiKey,
+                        taskId
+                    })
+                });
+                
+                if (!exportRes.ok) {
+                    const errData = await exportRes.json();
+                    throw new Error(`Failed to fetch GT from CVAT: ${errData.error}`);
+                }
+                
+                const exportData = await exportRes.json();
+                currentGtContent = exportData.content;
+                setGtFileContent(currentGtContent);
+                
+                // Generate Schema
+                toast({ title: "Generating Rules...", description: "Extracting evaluation schema from GT." });
+                const formData = new FormData();
+                if (currentGtContent) formData.append('gtFileContent', currentGtContent);
+                const schemaRes = await fetch('/api/schema', { method: 'POST', body: formData });
+                if (!schemaRes.ok) {
+                    const errData = await schemaRes.json();
+                    throw new Error(errData.error || 'Failed to extract schema');
+                }
+                const schemaData = await schemaRes.json();
+                currentEvalSchema = schemaData.schema;
+                setEvalSchema(currentEvalSchema);
+                setLoadedGtSourceId(`api-${taskId}`);
+            }
+        } else if (data.gtSourceMode === 'file' && loadedGtSourceId !== 'file') {
+             if (!currentEvalSchema || !currentGtContent) {
+                throw new Error("Please upload a Ground Truth file first to generate rules.");
+             }
+             setLoadedGtSourceId('file');
+        }
+
+        if (!currentEvalSchema || !currentGtContent) {
+            throw new Error("Missing Ground Truth data or Evaluation Rules.");
+        }
+  
         const imageFileInputs = data.imageFiles ? Array.from(data.imageFiles) : [];
         const batchResults: EvaluationResult[] = [];
         
@@ -270,18 +318,30 @@ export default function Home() {
         }
         
         if (newImageUrls.size === 0) {
-            throw new Error("No image files found. Please upload images either in the GT ZIP or the dedicated image upload field.");
+            // It's okay to not have images if they are just doing bounding boxes without rendering, 
+            // but the original code enforced it. Let's keep it but just log it if we need to.
+            console.log("No image files found, skipping image rendering.");
         }
         setImageUrls(newImageUrls);
 
         const formData = new FormData();
-        formData.append('gtFileContent', gtFileContent);
-        formData.append('evalSchema', JSON.stringify(evalSchema));
+        formData.append('gtFileContent', currentGtContent);
+        formData.append('evalSchema', JSON.stringify(currentEvalSchema));
         formData.append('toolType', data.toolType);
         formData.append('scoreOverrides', JSON.stringify(scoreOverrides));
-        formData.append('cvatTaskIds', data.cvatTaskIds);
-        formData.append('cvatApiUrl', data.cvatApiUrl);
-        formData.append('cvatApiKey', data.cvatApiKey);
+        
+        // Pass either API details OR files for student tasks
+        if (data.studentSourceMode === 'api') {
+            formData.append('cvatTaskIds', data.cvatTaskIds || '');
+            formData.append('cvatApiUrl', data.cvatApiUrl || '');
+            formData.append('cvatApiKey', data.cvatApiKey || '');
+        } else {
+             if (data.studentFiles) {
+                for (let i = 0; i < data.studentFiles.length; i++) {
+                     formData.append('studentFiles', data.studentFiles[i]);
+                }
+             }
+        }
 
         toast({ title: "Uploading to Server...", description: "Evaluating submissions in the background." });
 
