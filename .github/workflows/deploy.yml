@@ -16,13 +16,13 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/Ai_Annotator
+            cd ~/apps/Ai_Annotator
             
             # Pull latest changes from GitHub
             git pull origin main
             
             # Build and restart the containers in the background
-            docker-compose up -d --build
+            docker compose up -d --build
             
             # Remove old unused docker images to save space
             docker image prune -f
