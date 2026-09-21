@@ -1,0 +1,1577 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <task>
+      <id>920</id>
+      <name>Pair1_Pranjal</name>
+      <size>199</size>
+      <mode>annotation</mode>
+      <overlap>0</overlap>
+      <bugtracker></bugtracker>
+      <created>2026-04-18 17:23:07.963032+00:00</created>
+      <updated>2026-05-20 06:38:44.261520+00:00</updated>
+      <subset>default</subset>
+      <start_frame>0</start_frame>
+      <stop_frame>198</stop_frame>
+      <frame_filter></frame_filter>
+      <segments>
+        <segment>
+          <id>314</id>
+          <start>0</start>
+          <stop>198</stop>
+          <url>https://opencvat-ig.orchvate.com/api/jobs/314</url>
+        </segment>
+      </segments>
+      <owner>
+        <username>Aakash</username>
+        <email>aakash.padayachi@gmail.com</email>
+      </owner>
+      <assignee></assignee>
+      <labels>
+        <label>
+          <name>licence_plate</name>
+          <color>#0e8a64</color>
+          <type>any</type>
+          <attributes>
+            <attribute>
+              <name>plate_text</name>
+              <mutable>True</mutable>
+              <input_type>text</input_type>
+              <default_value></default_value>
+              <values></values>
+            </attribute>
+            <attribute>
+              <name>vehicle_id</name>
+              <mutable>True</mutable>
+              <input_type>number</input_type>
+              <default_value>0</default_value>
+              <values>0
+99
+1</values>
+            </attribute>
+            <attribute>
+              <name>license_Readablity</name>
+              <mutable>False</mutable>
+              <input_type>radio</input_type>
+              <default_value>Readable</default_value>
+              <values>Readable
+NOT_Readable</values>
+            </attribute>
+          </attributes>
+        </label>
+        <label>
+          <name>painted_plate_number</name>
+          <color>#fa3253</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>Mirror-Image</name>
+          <color>#490e29</color>
+          <type>tag</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>Rotated</name>
+          <color>#9ee25b</color>
+          <type>tag</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>No Plates</name>
+          <color>#cd5a40</color>
+          <type>tag</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>vehicle</name>
+          <color>#10a0c0</color>
+          <type>any</type>
+          <attributes>
+            <attribute>
+              <name>vehicle_type</name>
+              <mutable>False</mutable>
+              <input_type>radio</input_type>
+              <default_value>car</default_value>
+              <values>car
+bus
+truck
+motorcycle
+auto_rickshaw</values>
+            </attribute>
+            <attribute>
+              <name>vehicle_id</name>
+              <mutable>True</mutable>
+              <input_type>number</input_type>
+              <default_value>0</default_value>
+              <values>0
+99
+1</values>
+            </attribute>
+          </attributes>
+        </label>
+      </labels>
+    </task>
+    <dumped>2026-09-18 21:19:41.375539+00:00</dumped>
+  </meta>
+  <image id="0" name="ML_Model/annotation_dataset1/Pair_1/ml-01.jpg" width="2448" height="3264">
+    <box label="licence_plate" source="manual" occluded="0" xtl="686.22" ytl="1442.96" xbr="1396.06" ybr="1793.39" rotation="25.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="1" name="ML_Model/annotation_dataset1/Pair_1/ml-02.jpg" width="1968" height="4144">
+    <box label="licence_plate" source="manual" occluded="0" xtl="794.40" ytl="2715.92" xbr="1252.40" ybr="2874.92" rotation="357.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="2" name="ML_Model/annotation_dataset1/Pair_1/ml-03.jpg" width="2448" height="3264">
+    <box label="licence_plate" source="manual" occluded="0" xtl="680.74" ytl="1083.40" xbr="1692.80" ybr="1626.58" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="3" name="ML_Model/annotation_dataset1/Pair_1/ml-04.jpg" width="4000" height="3000">
+    <box label="licence_plate" source="manual" occluded="0" xtl="1044.37" ytl="1202.10" xbr="1321.82" ybr="2034.16" rotation="357.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="4" name="ML_Model/annotation_dataset1/Pair_1/ml-05.jpg" width="4000" height="3000">
+    <box label="licence_plate" source="manual" occluded="0" xtl="516.36" ytl="-28.62" xbr="1903.34" ybr="2181.47" rotation="353.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="5" name="ML_Model/annotation_dataset1/Pair_1/ml-06.jpg" width="2448" height="3264">
+    <box label="licence_plate" source="manual" occluded="0" xtl="556.54" ytl="1232.03" xbr="1482.49" ybr="1531.72" rotation="13.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="6" name="ML_Model/annotation_dataset1/Pair_1/ml-07.jpg" width="3264" height="2448">
+    <box label="licence_plate" source="manual" occluded="0" xtl="829.42" ytl="484.89" xbr="1662.78" ybr="2090.27" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="7" name="ML_Model/annotation_dataset1/Pair_1/ml-10.jpg" width="4032" height="3024">
+    <box label="licence_plate" source="manual" occluded="0" xtl="1364.70" ytl="1092.00" xbr="1582.30" ybr="2058.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="8" name="ML_Model/annotation_dataset1/Pair_1/ml-100.jpg" width="4000" height="3000">
+    <box label="licence_plate" source="manual" occluded="0" xtl="1827.30" ytl="958.98" xbr="2022.90" ybr="1348.79" rotation="357.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="9" name="ML_Model/annotation_dataset1/Pair_1/ml-10002.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="142.59" ytl="308.56" xbr="495.87" ybr="436.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="10" name="ML_Model/annotation_dataset1/Pair_1/ml-10003.jpg" width="640" height="640">
+    <box label="painted_plate_number" source="manual" occluded="0" xtl="459.40" ytl="520.38" xbr="550.90" ybr="554.30" rotation="3.00" z_order="0">
+    </box>
+  </image>
+  <image id="11" name="ML_Model/annotation_dataset1/Pair_1/ml-10007.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="394.06" ytl="393.97" xbr="610.41" ybr="479.34" rotation="351.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="12" name="ML_Model/annotation_dataset1/Pair_1/ml-10008.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="245.87" ytl="341.90" xbr="410.60" ybr="356.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="13" name="ML_Model/annotation_dataset1/Pair_1/ml-1001.jpg" width="358" height="435">
+    <box label="licence_plate" source="manual" occluded="0" xtl="93.90" ytl="346.31" xbr="250.55" ybr="379.83" rotation="355.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="14" name="ML_Model/annotation_dataset1/Pair_1/ml-10011.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="104.44" ytl="405.64" xbr="291.69" ybr="499.26" rotation="12.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="15" name="ML_Model/annotation_dataset1/Pair_1/ml-10013.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="100.80" ytl="434.33" xbr="290.70" ybr="489.91" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="16" name="ML_Model/annotation_dataset1/Pair_1/ml-10015.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="540.29" ytl="492.06" xbr="606.84" ybr="547.85" rotation="318.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="17" name="ML_Model/annotation_dataset1/Pair_1/ml-10017.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="211.51" ytl="400.39" xbr="399.88" ybr="449.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="18" name="ML_Model/annotation_dataset1/Pair_1/ml-10018.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="35.55" ytl="280.20" xbr="194.55" ybr="354.72" rotation="12.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="19" name="ML_Model/annotation_dataset1/Pair_1/ml-1002.jpg" width="1201" height="838">
+    <box label="licence_plate" source="manual" occluded="0" xtl="227.26" ytl="309.08" xbr="496.98" ybr="387.98" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="20" name="ML_Model/annotation_dataset1/Pair_1/ml-10021.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="79.60" ytl="458.92" xbr="238.30" ybr="503.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="21" name="ML_Model/annotation_dataset1/Pair_1/ml-10023.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="166.03" ytl="230.02" xbr="418.21" ybr="299.40" rotation="356.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="22" name="ML_Model/annotation_dataset1/Pair_1/ml-10024.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="253.93" ytl="348.53" xbr="426.40" ybr="377.35" rotation="359.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="23" name="ML_Model/annotation_dataset1/Pair_1/ml-10025.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="197.51" ytl="390.04" xbr="425.21" ybr="453.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="24" name="ML_Model/annotation_dataset1/Pair_1/ml-10027.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="102.30" ytl="268.83" xbr="343.58" ybr="356.64" rotation="2.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="25" name="ML_Model/annotation_dataset1/Pair_1/ml-10029.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="261.26" ytl="498.60" xbr="419.97" ybr="532.00" rotation="356.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="26" name="ML_Model/annotation_dataset1/Pair_1/ml-1003.jpg" width="441" height="550">
+    <box label="licence_plate" source="manual" occluded="0" xtl="189.61" ytl="431.07" xbr="357.50" ybr="471.37" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="27" name="ML_Model/annotation_dataset1/Pair_1/ml-10030.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="103.38" ytl="280.22" xbr="278.16" ybr="334.08" rotation="10.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="28" name="ML_Model/annotation_dataset1/Pair_1/ml-10031.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="227.93" ytl="449.87" xbr="408.07" ybr="482.57" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="29" name="ML_Model/annotation_dataset1/Pair_1/ml-10032.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="78.69" ytl="340.05" xbr="292.78" ybr="415.41" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="30" name="ML_Model/annotation_dataset1/Pair_1/ml-10033.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="148.31" ytl="272.58" xbr="451.12" ybr="422.46" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="31" name="ML_Model/annotation_dataset1/Pair_1/ml-10035.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="97.82" ytl="460.16" xbr="268.55" ybr="492.69" rotation="6.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="32" name="ML_Model/annotation_dataset1/Pair_1/ml-10036.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="137.38" ytl="377.48" xbr="328.20" ybr="430.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="33" name="ML_Model/annotation_dataset1/Pair_1/ml-10037.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="212.60" ytl="327.00" xbr="398.70" ybr="373.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="34" name="ML_Model/annotation_dataset1/Pair_1/ml-10038.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="153.50" ytl="508.60" xbr="260.76" ybr="573.80" rotation="4.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="35" name="ML_Model/annotation_dataset1/Pair_1/ml-10039.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="113.55" ytl="323.41" xbr="183.90" ybr="400.19" rotation="354.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="36" name="ML_Model/annotation_dataset1/Pair_1/ml-1004.jpg" width="502" height="404">
+    <box label="licence_plate" source="manual" occluded="0" xtl="197.08" ytl="209.68" xbr="321.27" ybr="239.67" rotation="354.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="37" name="ML_Model/annotation_dataset1/Pair_1/ml-10041.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="280.62" ytl="473.33" xbr="540.14" ybr="516.57" rotation="346.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="38" name="ML_Model/annotation_dataset1/Pair_1/ml-10042.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="46.00" ytl="186.53" xbr="191.39" ybr="270.20" rotation="26.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="39" name="ML_Model/annotation_dataset1/Pair_1/ml-10043.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="175.38" ytl="540.40" xbr="401.98" ybr="606.50" rotation="357.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="40" name="ML_Model/annotation_dataset1/Pair_1/ml-10044.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="259.98" ytl="485.00" xbr="445.31" ybr="516.81" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="41" name="ML_Model/annotation_dataset1/Pair_1/ml-10045.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="171.30" ytl="518.38" xbr="368.62" ybr="561.81" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="42" name="ML_Model/annotation_dataset1/Pair_1/ml-10046.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="371.89" ytl="86.39" xbr="540.06" ybr="200.84" rotation="185.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="43" name="ML_Model/annotation_dataset1/Pair_1/ml-10047.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="147.03" ytl="442.04" xbr="363.24" ybr="533.33" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="44" name="ML_Model/annotation_dataset1/Pair_1/ml-10048.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="234.47" ytl="389.30" xbr="444.20" ybr="496.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="45" name="ML_Model/annotation_dataset1/Pair_1/ml-10049.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="208.72" ytl="292.99" xbr="444.76" ybr="349.48" rotation="2.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="46" name="ML_Model/annotation_dataset1/Pair_1/ml-1005.jpg" width="769" height="1080">
+    <box label="licence_plate" source="manual" occluded="0" xtl="95.90" ytl="610.51" xbr="224.70" ybr="652.73" rotation="6.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="47" name="ML_Model/annotation_dataset1/Pair_1/ml-10050.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="140.41" ytl="391.31" xbr="381.80" ybr="513.31" rotation="4.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="48" name="ML_Model/annotation_dataset1/Pair_1/ml-10052.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="222.06" ytl="395.80" xbr="462.64" ybr="417.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Mirror-Image" source="manual">
+    </tag>
+  </image>
+  <image id="49" name="ML_Model/annotation_dataset1/Pair_1/ml-10053.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="193.30" ytl="351.19" xbr="404.00" ybr="372.09" rotation="0.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="50" name="ML_Model/annotation_dataset1/Pair_1/ml-10054.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="173.10" ytl="406.00" xbr="418.60" ybr="469.23" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="51" name="ML_Model/annotation_dataset1/Pair_1/ml-10055.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="208.56" ytl="289.52" xbr="639.01" ybr="475.93" rotation="176.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Rotated" source="manual">
+    </tag>
+  </image>
+  <image id="52" name="ML_Model/annotation_dataset1/Pair_1/ml-10056.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="73.75" ytl="570.40" xbr="411.10" ybr="622.58" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="53" name="ML_Model/annotation_dataset1/Pair_1/ml-10059.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="213.40" ytl="483.13" xbr="359.00" ybr="565.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="54" name="ML_Model/annotation_dataset1/Pair_1/ml-10060.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="204.80" ytl="476.20" xbr="426.20" ybr="552.82" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="55" name="ML_Model/annotation_dataset1/Pair_1/ml-10061.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="280.84" ytl="547.95" xbr="392.70" ybr="589.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="56" name="ML_Model/annotation_dataset1/Pair_1/ml-10062.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="518.82" ytl="395.71" xbr="609.98" ybr="449.11" rotation="330.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="57" name="ML_Model/annotation_dataset1/Pair_1/ml-10063.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="2.60" ytl="304.79" xbr="185.41" ybr="382.03" rotation="8.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="58" name="ML_Model/annotation_dataset1/Pair_1/ml-10064.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="182.70" ytl="346.30" xbr="397.14" ybr="379.56" rotation="3.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="59" name="ML_Model/annotation_dataset1/Pair_1/ml-10065.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="125.20" ytl="285.85" xbr="350.97" ybr="369.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Mirror-Image" source="manual">
+    </tag>
+  </image>
+  <image id="60" name="ML_Model/annotation_dataset1/Pair_1/ml-10067.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="247.10" ytl="409.30" xbr="392.32" ybr="457.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="61" name="ML_Model/annotation_dataset1/Pair_1/ml-10068.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="422.73" ytl="435.86" xbr="532.15" ybr="483.06" rotation="350.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="62" name="ML_Model/annotation_dataset1/Pair_1/ml-10069.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="64.62" ytl="287.79" xbr="289.44" ybr="379.93" rotation="6.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="63" name="ML_Model/annotation_dataset1/Pair_1/ml-10070.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="202.46" ytl="368.71" xbr="444.22" ybr="413.64" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="64" name="ML_Model/annotation_dataset1/Pair_1/ml-10071.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="29.15" ytl="396.94" xbr="117.54" ybr="450.83" rotation="26.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="65" name="ML_Model/annotation_dataset1/Pair_1/ml-10072.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="44.89" ytl="383.18" xbr="192.30" ybr="462.53" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="66" name="ML_Model/annotation_dataset1/Pair_1/ml-10073.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="278.58" ytl="216.78" xbr="414.12" ybr="268.09" rotation="339.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="67" name="ML_Model/annotation_dataset1/Pair_1/ml-10074.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="355.25" ytl="302.91" xbr="448.10" ybr="314.49" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="68" name="ML_Model/annotation_dataset1/Pair_1/ml-10076.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="293.93" ytl="309.52" xbr="373.07" ybr="334.47" rotation="336.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="69" name="ML_Model/annotation_dataset1/Pair_1/ml-10077.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="254.49" ytl="425.10" xbr="480.13" ybr="475.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="70" name="ML_Model/annotation_dataset1/Pair_1/ml-10078.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="145.19" ytl="280.50" xbr="496.58" ybr="371.43" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="71" name="ML_Model/annotation_dataset1/Pair_1/ml-10079.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="181.27" ytl="502.70" xbr="442.60" ybr="564.87" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="72" name="ML_Model/annotation_dataset1/Pair_1/ml-1008.jpg" width="351" height="644">
+    <box label="licence_plate" source="manual" occluded="0" xtl="113.19" ytl="461.60" xbr="209.28" ybr="486.19" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="73" name="ML_Model/annotation_dataset1/Pair_1/ml-10080.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="395.51" ytl="596.90" xbr="585.32" ybr="640.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="74" name="ML_Model/annotation_dataset1/Pair_1/ml-10084.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="179.00" ytl="483.30" xbr="365.10" ybr="535.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="75" name="ML_Model/annotation_dataset1/Pair_1/ml-10085.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="258.52" ytl="515.86" xbr="393.89" ybr="588.91" rotation="351.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="76" name="ML_Model/annotation_dataset1/Pair_1/ml-10086.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="251.20" ytl="471.56" xbr="414.35" ybr="516.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="77" name="ML_Model/annotation_dataset1/Pair_1/ml-10087.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="8.20" ytl="114.63" xbr="313.03" ybr="259.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="78" name="ML_Model/annotation_dataset1/Pair_1/ml-10088.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="237.48" ytl="381.84" xbr="442.78" ybr="462.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="79" name="ML_Model/annotation_dataset1/Pair_1/ml-10089.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="125.50" ytl="183.11" xbr="303.60" ybr="282.31" rotation="2.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="80" name="ML_Model/annotation_dataset1/Pair_1/ml-10091.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="223.72" ytl="445.61" xbr="379.60" ybr="472.72" rotation="356.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="81" name="ML_Model/annotation_dataset1/Pair_1/ml-10093.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="244.90" ytl="440.00" xbr="421.93" ybr="473.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="82" name="ML_Model/annotation_dataset1/Pair_1/ml-10094.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="147.88" ytl="471.90" xbr="388.47" ybr="538.60" rotation="357.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="83" name="ML_Model/annotation_dataset1/Pair_1/ml-10095.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="357.94" ytl="359.97" xbr="439.43" ybr="389.67" rotation="345.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="84" name="ML_Model/annotation_dataset1/Pair_1/ml-10098.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="272.85" ytl="291.37" xbr="417.80" ybr="370.07" rotation="0.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="85" name="ML_Model/annotation_dataset1/Pair_1/ml-10099.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="123.40" ytl="289.70" xbr="198.53" ybr="334.31" rotation="351.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="86" name="ML_Model/annotation_dataset1/Pair_1/ml-10100.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="118.20" ytl="312.60" xbr="432.20" ybr="389.83" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="87" name="ML_Model/annotation_dataset1/Pair_1/ml-10102.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="156.36" ytl="411.42" xbr="405.52" ybr="451.29" rotation="358.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="88" name="ML_Model/annotation_dataset1/Pair_1/ml-10103.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="221.34" ytl="549.42" xbr="368.11" ybr="628.31" rotation="11.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="89" name="ML_Model/annotation_dataset1/Pair_1/ml-10104.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="221.86" ytl="367.22" xbr="406.74" ybr="397.62" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="90" name="ML_Model/annotation_dataset1/Pair_1/ml-10105.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="188.32" ytl="288.18" xbr="357.08" ybr="354.58" rotation="25.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="91" name="ML_Model/annotation_dataset1/Pair_1/ml-10106.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="218.57" ytl="341.35" xbr="338.31" ybr="425.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="92" name="ML_Model/annotation_dataset1/Pair_1/ml-10107.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="173.07" ytl="445.60" xbr="470.01" ybr="533.04" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="93" name="ML_Model/annotation_dataset1/Pair_1/ml-10109.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="231.69" ytl="351.10" xbr="416.07" ybr="379.28" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="94" name="ML_Model/annotation_dataset1/Pair_1/ml-10110.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="87.48" ytl="165.03" xbr="515.55" ybr="330.67" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="95" name="ML_Model/annotation_dataset1/Pair_1/ml-10111.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="205.50" ytl="349.70" xbr="412.16" ybr="376.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Mirror-Image" source="manual">
+    </tag>
+  </image>
+  <image id="96" name="ML_Model/annotation_dataset1/Pair_1/ml-10112.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="273.47" ytl="172.12" xbr="301.51" ybr="190.69" rotation="34.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="97" name="ML_Model/annotation_dataset1/Pair_1/ml-10113.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="268.34" ytl="506.23" xbr="428.27" ybr="558.85" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="98" name="ML_Model/annotation_dataset1/Pair_1/ml-10114.jpg" width="640" height="640">
+  </image>
+  <image id="99" name="ML_Model/annotation_dataset1/Pair_1/ml-10115.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="210.80" ytl="252.96" xbr="412.95" ybr="297.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="100" name="ML_Model/annotation_dataset1/Pair_1/ml-10116.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="73.06" ytl="405.76" xbr="294.57" ybr="486.60" rotation="10.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="101" name="ML_Model/annotation_dataset1/Pair_1/ml-10117.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="172.20" ytl="412.89" xbr="390.40" ybr="512.86" rotation="359.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="102" name="ML_Model/annotation_dataset1/Pair_1/ml-10119.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="255.62" ytl="463.72" xbr="459.28" ybr="520.70" rotation="357.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="103" name="ML_Model/annotation_dataset1/Pair_1/ml-10121.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="-5.95" ytl="75.50" xbr="611.95" ybr="301.58" rotation="355.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="104" name="ML_Model/annotation_dataset1/Pair_1/ml-10122.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="139.16" ytl="263.91" xbr="314.90" ybr="332.13" rotation="5.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="105" name="ML_Model/annotation_dataset1/Pair_1/ml-10123.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="213.12" ytl="436.05" xbr="409.12" ybr="471.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="106" name="ML_Model/annotation_dataset1/Pair_1/ml-10124.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="335.22" ytl="403.70" xbr="492.57" ybr="437.26" rotation="2.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="107" name="ML_Model/annotation_dataset1/Pair_1/ml-10126.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="233.11" ytl="393.71" xbr="418.89" ybr="416.30" rotation="356.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="108" name="ML_Model/annotation_dataset1/Pair_1/ml-10128.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="118.90" ytl="544.20" xbr="260.10" ybr="602.87" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="109" name="ML_Model/annotation_dataset1/Pair_1/ml-10129.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="212.08" ytl="426.30" xbr="323.11" ybr="454.06" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="110" name="ML_Model/annotation_dataset1/Pair_1/ml-1013.jpg" width="1117" height="675">
+    <box label="licence_plate" source="manual" occluded="0" xtl="277.50" ytl="229.40" xbr="454.29" ybr="282.30" rotation="357.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="111" name="ML_Model/annotation_dataset1/Pair_1/ml-10130.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="334.41" ytl="116.10" xbr="447.26" ybr="140.85" rotation="6.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="112" name="ML_Model/annotation_dataset1/Pair_1/ml-10131.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="172.91" ytl="231.11" xbr="532.38" ybr="357.50" rotation="357.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="113" name="ML_Model/annotation_dataset1/Pair_1/ml-10133.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="250.79" ytl="480.85" xbr="406.10" ybr="518.23" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="114" name="ML_Model/annotation_dataset1/Pair_1/ml-10134.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="311.80" ytl="513.74" xbr="396.34" ybr="573.55" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="305.49" ytl="310.00" xbr="435.29" ybr="338.58" rotation="353.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Mirror-Image" source="manual">
+    </tag>
+  </image>
+  <image id="115" name="ML_Model/annotation_dataset1/Pair_1/ml-10135.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="124.83" ytl="515.03" xbr="235.17" ybr="568.16" rotation="7.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="116" name="ML_Model/annotation_dataset1/Pair_1/ml-10137.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="449.69" ytl="443.00" xbr="540.24" ybr="486.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="117" name="ML_Model/annotation_dataset1/Pair_1/ml-10138.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="218.84" ytl="363.48" xbr="396.37" ybr="391.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="118" name="ML_Model/annotation_dataset1/Pair_1/ml-10139.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="380.79" ytl="318.90" xbr="509.17" ybr="370.89" rotation="354.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Mirror-Image" source="manual">
+    </tag>
+  </image>
+  <image id="119" name="ML_Model/annotation_dataset1/Pair_1/ml-1014.jpg" width="455" height="595">
+    <box label="licence_plate" source="manual" occluded="0" xtl="186.75" ytl="254.70" xbr="320.22" ybr="292.95" rotation="357.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="120" name="ML_Model/annotation_dataset1/Pair_1/ml-10142.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="181.09" ytl="189.10" xbr="327.87" ybr="219.00" rotation="176.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="121" name="ML_Model/annotation_dataset1/Pair_1/ml-10147.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="273.04" ytl="374.73" xbr="400.65" ybr="410.62" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="122" name="ML_Model/annotation_dataset1/Pair_1/ml-10149.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="268.26" ytl="367.55" xbr="414.20" ybr="402.64" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="123" name="ML_Model/annotation_dataset1/Pair_1/ml-1015.jpg" width="535" height="647">
+    <box label="licence_plate" source="manual" occluded="0" xtl="112.21" ytl="386.70" xbr="254.51" ybr="422.17" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="124" name="ML_Model/annotation_dataset1/Pair_1/ml-10151.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="271.23" ytl="582.74" xbr="432.74" ybr="631.34" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="125" name="ML_Model/annotation_dataset1/Pair_1/ml-10152.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="120.92" ytl="470.13" xbr="333.89" ybr="573.07" rotation="12.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="126" name="ML_Model/annotation_dataset1/Pair_1/ml-10153.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="29.69" ytl="407.44" xbr="209.55" ybr="468.38" rotation="7.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="127" name="ML_Model/annotation_dataset1/Pair_1/ml-10154.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="268.26" ytl="266.36" xbr="390.95" ybr="288.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="128" name="ML_Model/annotation_dataset1/Pair_1/ml-10156.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="112.00" ytl="416.10" xbr="268.42" ybr="466.31" rotation="4.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="129" name="ML_Model/annotation_dataset1/Pair_1/ml-10157.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="258.07" ytl="407.60" xbr="447.24" ybr="485.12" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="130" name="ML_Model/annotation_dataset1/Pair_1/ml-10158.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="213.61" ytl="301.37" xbr="393.45" ybr="323.64" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="131" name="ML_Model/annotation_dataset1/Pair_1/ml-10161.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="48.18" ytl="290.58" xbr="251.18" ybr="371.80" rotation="11.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="132" name="ML_Model/annotation_dataset1/Pair_1/ml-10163.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="132.20" ytl="515.57" xbr="309.80" ybr="556.48" rotation="5.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="133" name="ML_Model/annotation_dataset1/Pair_1/ml-10164.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="171.21" ytl="407.20" xbr="427.25" ybr="499.61" rotation="5.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="134" name="ML_Model/annotation_dataset1/Pair_1/ml-10167.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="163.66" ytl="438.30" xbr="332.31" ybr="522.00" rotation="2.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="135" name="ML_Model/annotation_dataset1/Pair_1/ml-10168.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="89.56" ytl="464.52" xbr="245.11" ybr="534.44" rotation="11.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="136" name="ML_Model/annotation_dataset1/Pair_1/ml-10169.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="162.94" ytl="441.20" xbr="391.63" ybr="472.60" rotation="2.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="137" name="ML_Model/annotation_dataset1/Pair_1/ml-10171.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="418.83" ytl="489.38" xbr="509.13" ybr="529.02" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="138" name="ML_Model/annotation_dataset1/Pair_1/ml-10176.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="228.54" ytl="352.28" xbr="386.43" ybr="372.50" rotation="1.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="139" name="ML_Model/annotation_dataset1/Pair_1/ml-1018.jpg" width="748" height="656">
+    <box label="licence_plate" source="manual" occluded="0" xtl="130.27" ytl="278.25" xbr="267.25" ybr="322.90" rotation="8.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="140" name="ML_Model/annotation_dataset1/Pair_1/ml-10180.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="474.66" ytl="498.66" xbr="571.56" ybr="537.34" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="141" name="ML_Model/annotation_dataset1/Pair_1/ml-10182.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="217.18" ytl="182.32" xbr="394.67" ybr="215.42" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Rotated" source="manual">
+    </tag>
+  </image>
+  <image id="142" name="ML_Model/annotation_dataset1/Pair_1/ml-10183.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="41.54" ytl="245.90" xbr="330.47" ybr="350.18" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="143" name="ML_Model/annotation_dataset1/Pair_1/ml-10184.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="218.90" ytl="433.39" xbr="417.42" ybr="466.79" rotation="356.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="144" name="ML_Model/annotation_dataset1/Pair_1/ml-10188.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="216.73" ytl="485.79" xbr="465.03" ybr="526.70" rotation="359.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="145" name="ML_Model/annotation_dataset1/Pair_1/ml-10192.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="230.19" ytl="263.92" xbr="435.87" ybr="348.63" rotation="344.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="146" name="ML_Model/annotation_dataset1/Pair_1/ml-10196.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="114.44" ytl="445.04" xbr="341.76" ybr="572.99" rotation="15.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="147" name="ML_Model/annotation_dataset1/Pair_1/ml-102.jpg" width="4000" height="3000">
+    <box label="licence_plate" source="manual" occluded="0" xtl="1402.87" ytl="1298.11" xbr="1900.16" ybr="1557.93" rotation="247.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="148" name="ML_Model/annotation_dataset1/Pair_1/ml-1020.jpg" width="1920" height="1080">
+    <box label="licence_plate" source="manual" occluded="0" xtl="16.14" ytl="120.78" xbr="163.31" ybr="153.69" rotation="24.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="556.75" ytl="285.96" xbr="897.27" ybr="391.32" rotation="7.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="149" name="ML_Model/annotation_dataset1/Pair_1/ml-10200.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="307.89" ytl="151.01" xbr="389.23" ybr="181.00" rotation="356.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="150" name="ML_Model/annotation_dataset1/Pair_1/ml-10202.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="230.21" ytl="168.60" xbr="394.01" ybr="240.62" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Rotated" source="manual">
+    </tag>
+  </image>
+  <image id="151" name="ML_Model/annotation_dataset1/Pair_1/ml-10204.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="227.60" ytl="290.23" xbr="485.52" ybr="414.06" rotation="352.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="152" name="ML_Model/annotation_dataset1/Pair_1/ml-10205.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="229.02" ytl="544.40" xbr="414.44" ybr="584.68" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="153" name="ML_Model/annotation_dataset1/Pair_1/ml-10208.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="45.45" ytl="179.90" xbr="193.67" ybr="272.88" rotation="28.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="154" name="ML_Model/annotation_dataset1/Pair_1/ml-10211.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="241.90" ytl="305.49" xbr="404.20" ybr="330.94" rotation="350.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="155" name="ML_Model/annotation_dataset1/Pair_1/ml-10214.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="304.60" ytl="369.46" xbr="525.36" ybr="448.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="156" name="ML_Model/annotation_dataset1/Pair_1/ml-10215.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="218.60" ytl="216.83" xbr="443.85" ybr="311.67" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="157" name="ML_Model/annotation_dataset1/Pair_1/ml-10216.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="112.82" ytl="409.20" xbr="328.52" ybr="477.06" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="158" name="ML_Model/annotation_dataset1/Pair_1/ml-10217.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="251.40" ytl="396.30" xbr="420.83" ybr="417.31" rotation="0.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="159" name="ML_Model/annotation_dataset1/Pair_1/ml-10218.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="402.48" ytl="415.05" xbr="515.87" ybr="459.98" rotation="349.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="160" name="ML_Model/annotation_dataset1/Pair_1/ml-1022.jpg" width="545" height="613">
+    <box label="licence_plate" source="manual" occluded="0" xtl="147.43" ytl="384.14" xbr="229.10" ybr="411.73" rotation="7.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="161" name="ML_Model/annotation_dataset1/Pair_1/ml-10224.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="109.83" ytl="460.00" xbr="246.41" ybr="510.40" rotation="4.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="162" name="ML_Model/annotation_dataset1/Pair_1/ml-10225.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="178.35" ytl="375.45" xbr="440.70" ybr="473.46" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="163" name="ML_Model/annotation_dataset1/Pair_1/ml-10226.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="233.06" ytl="205.75" xbr="388.18" ybr="226.56" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="164" name="ML_Model/annotation_dataset1/Pair_1/ml-10228.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="44.84" ytl="466.25" xbr="196.22" ybr="514.20" rotation="9.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="165" name="ML_Model/annotation_dataset1/Pair_1/ml-10230.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="205.84" ytl="248.40" xbr="415.44" ybr="275.00" rotation="2.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="166" name="ML_Model/annotation_dataset1/Pair_1/ml-10244.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="125.15" ytl="498.07" xbr="301.34" ybr="560.79" rotation="4.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="167" name="ML_Model/annotation_dataset1/Pair_1/ml-10250.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="46.04" ytl="511.64" xbr="126.15" ybr="554.10" rotation="4.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="168" name="ML_Model/annotation_dataset1/Pair_1/ml-10254.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="290.58" ytl="293.22" xbr="452.38" ybr="339.74" rotation="174.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="169" name="ML_Model/annotation_dataset1/Pair_1/ml-10255.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="313.28" ytl="458.83" xbr="594.58" ybr="541.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="170" name="ML_Model/annotation_dataset1/Pair_1/ml-10257.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="399.47" ytl="300.40" xbr="604.16" ybr="377.27" rotation="356.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="171" name="ML_Model/annotation_dataset1/Pair_1/ml-1026.jpg" width="527" height="298">
+    <box label="licence_plate" source="manual" occluded="0" xtl="51.73" ytl="120.97" xbr="166.27" ybr="153.81" rotation="5.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="172" name="ML_Model/annotation_dataset1/Pair_1/ml-10260.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="360.20" ytl="301.50" xbr="380.22" ybr="307.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="173" name="ML_Model/annotation_dataset1/Pair_1/ml-10270.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="372.29" ytl="466.49" xbr="525.30" ybr="494.87" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="174" name="ML_Model/annotation_dataset1/Pair_1/ml-10274.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="215.55" ytl="448.90" xbr="466.47" ybr="478.61" rotation="359.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="175" name="ML_Model/annotation_dataset1/Pair_1/ml-10277.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="221.21" ytl="408.40" xbr="409.56" ybr="449.00" rotation="3.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="176" name="ML_Model/annotation_dataset1/Pair_1/ml-10278.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="288.76" ytl="263.90" xbr="487.57" ybr="288.30" rotation="2.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="177" name="ML_Model/annotation_dataset1/Pair_1/ml-10279.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="360.61" ytl="185.18" xbr="422.30" ybr="212.45" rotation="340.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="178" name="ML_Model/annotation_dataset1/Pair_1/ml-10284.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="221.13" ytl="363.45" xbr="269.21" ybr="383.48" rotation="306.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="179" name="ML_Model/annotation_dataset1/Pair_1/ml-10289.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="199.82" ytl="247.17" xbr="362.74" ybr="266.55" rotation="353.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="180" name="ML_Model/annotation_dataset1/Pair_1/ml-1029.jpg" width="652" height="696">
+    <box label="licence_plate" source="manual" occluded="0" xtl="252.83" ytl="499.80" xbr="415.10" ybr="544.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="181" name="ML_Model/annotation_dataset1/Pair_1/ml-10293.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="21.20" ytl="179.58" xbr="129.40" ybr="265.51" rotation="30.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="182" name="ML_Model/annotation_dataset1/Pair_1/ml-10299.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="258.92" ytl="247.05" xbr="419.68" ybr="268.78" rotation="14.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="183" name="ML_Model/annotation_dataset1/Pair_1/ml-103.jpg" width="4000" height="3000">
+    <box label="licence_plate" source="manual" occluded="0" xtl="3575.19" ytl="1021.37" xbr="3618.93" ybr="1041.39" rotation="347.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="3267.20" ytl="981.58" xbr="3315.70" ybr="1005.83" rotation="345.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="3233.11" ytl="1070.71" xbr="3275.34" ybr="1100.63" rotation="337.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="3100.60" ytl="1110.96" xbr="3160.67" ybr="1157.14" rotation="322.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="2946.94" ytl="1105.57" xbr="3020.20" ybr="1154.37" rotation="332.50" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="2643.93" ytl="1175.18" xbr="2723.07" ybr="1227.79" rotation="335.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="2385.77" ytl="1245.31" xbr="2489.06" ybr="1312.73" rotation="331.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="1987.46" ytl="1280.25" xbr="2122.19" ybr="1354.54" rotation="334.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <box label="licence_plate" source="manual" occluded="0" xtl="1436.21" ytl="1704.83" xbr="1644.82" ybr="1811.16" rotation="332.20" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="184" name="ML_Model/annotation_dataset1/Pair_1/ml-10301.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="148.02" ytl="377.58" xbr="536.23" ybr="440.69" rotation="7.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="185" name="ML_Model/annotation_dataset1/Pair_1/ml-10304.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="188.23" ytl="475.30" xbr="409.09" ybr="512.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="186" name="ML_Model/annotation_dataset1/Pair_1/ml-10307.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="279.33" ytl="519.93" xbr="421.65" ybr="571.14" rotation="4.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="187" name="ML_Model/annotation_dataset1/Pair_1/ml-10315.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="128.21" ytl="494.22" xbr="323.38" ybr="614.65" rotation="3.70" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="188" name="ML_Model/annotation_dataset1/Pair_1/ml-10318.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="-2.54" ytl="238.00" xbr="69.38" ybr="292.60" rotation="136.40" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Rotated" source="manual">
+    </tag>
+  </image>
+  <image id="189" name="ML_Model/annotation_dataset1/Pair_1/ml-10322.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="111.17" ytl="294.42" xbr="196.98" ybr="364.71" rotation="350.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="190" name="ML_Model/annotation_dataset1/Pair_1/ml-10323.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="197.94" ytl="505.80" xbr="424.10" ybr="543.30" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="191" name="ML_Model/annotation_dataset1/Pair_1/ml-10327.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="457.70" ytl="336.09" xbr="557.00" ybr="412.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="192" name="ML_Model/annotation_dataset1/Pair_1/ml-10330.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="274.89" ytl="295.13" xbr="577.81" ybr="375.31" rotation="354.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="193" name="ML_Model/annotation_dataset1/Pair_1/ml-10342.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="209.90" ytl="439.93" xbr="425.99" ybr="473.71" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="194" name="ML_Model/annotation_dataset1/Pair_1/ml-10356.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="119.67" ytl="262.12" xbr="494.84" ybr="317.23" rotation="15.80" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="195" name="ML_Model/annotation_dataset1/Pair_1/ml-10357.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="83.76" ytl="324.90" xbr="254.27" ybr="431.52" rotation="3.00" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="196" name="ML_Model/annotation_dataset1/Pair_1/ml-10358.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="226.42" ytl="325.70" xbr="421.22" ybr="359.00" rotation="1.10" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+    <tag label="Mirror-Image" source="manual">
+    </tag>
+  </image>
+  <image id="197" name="ML_Model/annotation_dataset1/Pair_1/ml-10370.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="287.95" ytl="483.05" xbr="432.14" ybr="518.29" rotation="2.60" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+  <image id="198" name="ML_Model/annotation_dataset1/Pair_1/ml-10371.jpg" width="640" height="640">
+    <box label="licence_plate" source="manual" occluded="0" xtl="249.31" ytl="424.99" xbr="462.33" ybr="501.48" rotation="354.90" z_order="0">
+      <attribute name="plate_text"></attribute>
+      <attribute name="vehicle_id">0</attribute>
+      <attribute name="license_Readablity">Readable</attribute>
+    </box>
+  </image>
+</annotations>

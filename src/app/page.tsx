@@ -238,7 +238,6 @@ export default function Home() {
     setFeedbackCache(new Map());
   
     try {
-        const studentFileInputs = Array.from(data.studentFiles);
         const imageFileInputs = data.imageFiles ? Array.from(data.imageFiles) : [];
         const batchResults: EvaluationResult[] = [];
         
@@ -280,9 +279,9 @@ export default function Home() {
         formData.append('evalSchema', JSON.stringify(evalSchema));
         formData.append('toolType', data.toolType);
         formData.append('scoreOverrides', JSON.stringify(scoreOverrides));
-        for (const file of data.studentFiles) {
-            formData.append('studentFiles', file);
-        }
+        formData.append('cvatTaskIds', data.cvatTaskIds);
+        formData.append('cvatApiUrl', data.cvatApiUrl);
+        formData.append('cvatApiKey', data.cvatApiKey);
 
         toast({ title: "Uploading to Server...", description: "Evaluating submissions in the background." });
 

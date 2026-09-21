@@ -11,10 +11,12 @@ export async function POST(request: Request) {
         const gtFileContent = formData.get('gtFileContent') as string;
         const evalSchemaStr = formData.get('evalSchema') as string;
         const toolType = formData.get('toolType') as string;
-        const studentFilesData = formData.getAll('studentFiles') as File[];
+        const cvatTaskIds = formData.get('cvatTaskIds') as string;
         const scoreOverridesStr = formData.get('scoreOverrides') as string;
+        const cvatApiUrl = formData.get('cvatApiUrl') as string;
+        const cvatApiKey = formData.get('cvatApiKey') as string;
 
-        if (!gtFileContent || !evalSchemaStr || !studentFilesData.length) {
+        if (!gtFileContent || !evalSchemaStr || !cvatTaskIds || !cvatApiUrl || !cvatApiKey) {
             return NextResponse.json({ error: 'Missing required fields for evaluation' }, { status: 400 });
         }
 
@@ -33,51 +35,14 @@ export async function POST(request: Request) {
             });
         }
 
-        let studentFiles: { name: string, content: string }[] = [];
-
-        for (const file of studentFilesData) {
-            if (file.name.endsWith('.zip')) {
-                const zip = await JSZip.loadAsync(await file.arrayBuffer());
-                for (const filename in zip.files) {
-                    const fileInZip = zip.files[filename];
-                    if (fileInZip.dir) continue;
-                    
-                    if (filename.endsWith('.zip')) {
-                        try {
-                            const nestedZip = await JSZip.loadAsync(await fileInZip.async('blob'));
-                            for (const nestedFilename in nestedZip.files) {
-                                const nestedFile = nestedZip.files[nestedFilename];
-                                if (!nestedFile.dir && (nestedFilename.endsWith('.xml') || nestedFilename.endsWith('.json'))) {
-                                    const content = await nestedFile.async('string');
-                                    studentFiles.push({ name: filename, content });
-                                }
-                            }
-                        } catch(e) {
-                            console.error(`Skipping corrupted nested zip: ${filename}`, e);
-                        }
-                    } else if (filename.endsWith('.xml') || filename.endsWith('.json')) {
-                        const content = await fileInZip.async('string');
-                        studentFiles.push({ name: filename, content });
-                    }
-                }
-            } else {
-                studentFiles.push({
-                    name: file.name,
-                    content: await file.text()
-                });
-            }
-        }
-
-        if (studentFiles.length === 0) {
-            return NextResponse.json({ error: 'No valid annotation files (.xml or .json) found in the upload.' }, { status: 400 });
-        }
-
         const job = await evaluationQueue.add('evaluateBatch', {
             gtFileContent,
             evalSchema,
             toolType,
             scoreOverrides,
-            studentFiles
+            cvatTaskIds,
+            cvatApiUrl,
+            cvatApiKey
         });
 
         return NextResponse.json({ jobId: job.id, status: 'queued' });

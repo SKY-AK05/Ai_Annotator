@@ -1,0 +1,302 @@
+{
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\next.config.ts": {
+    "mtime": 1789753724.9901366,
+    "hash": "5a8d4c1ffa6b490c71f0e809acdddbd3"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\postcss.config.mjs": {
+    "mtime": 1789753725.0001519,
+    "hash": "3507368dae6e94b0070b0a10efa15a05"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\tailwind.config.ts": {
+    "mtime": 1789753725.1018276,
+    "hash": "7c3d272acd95398e04e3abc12edaed35"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\tailwind.config.ts": {
+    "mtime": 1789753725.1009288,
+    "hash": "1b963c0455a7a6ea6daafa3f9b0c3b6f"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\ai\\genkit.ts": {
+    "mtime": 1789753725.0077689,
+    "hash": "203bd62bb067921ce17c678fd5227f87"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\ai\\flows\\annotation-feedback-flow.ts": {
+    "mtime": 1789753725.0041587,
+    "hash": "a8b05207387db9dce38ab660d1bedcec"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\ai\\flows\\extract-eval-schema.ts": {
+    "mtime": 1789753725.005157,
+    "hash": "59b64e98a2e40b33674145caa5aad442"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\app\\layout.tsx": {
+    "mtime": 1789753725.0096958,
+    "hash": "4030174373961c1ee12ac77d0edd1735"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\app\\page.tsx": {
+    "mtime": 1789753725.0118003,
+    "hash": "62bbcaba67a8e0490954f465c93ef749"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\AnnotationViewer.tsx": {
+    "mtime": 1789753725.014692,
+    "hash": "0e2c27ba412b06bbefe005fc4241d2e1"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\AnnotatorAiLogo.tsx": {
+    "mtime": 1789753725.0167973,
+    "hash": "e2b46056e0ceb116c3d311d378c6a7d5"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\EditableScoreCell.tsx": {
+    "mtime": 1789753725.0197027,
+    "hash": "3fc417637c2ee3ccc44b922bfe723bf9"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\EvaluationFileForm.tsx": {
+    "mtime": 1789753725.0197027,
+    "hash": "910755cc7210f78e2f8f3b1c26ef5ca4"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\EvaluationForm.tsx": {
+    "mtime": 1789753725.0206919,
+    "hash": "15048e8d37390c41ab3b00417ea4cfc2"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\PolygonAnnotationPage.tsx": {
+    "mtime": 1789753725.0246916,
+    "hash": "89a0d8f23aebaa06670d22e6aff79c60"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\PolygonResultsDashboard.tsx": {
+    "mtime": 1789753725.0266967,
+    "hash": "2ad0cd86aefe4c65113ddbc0aa831bc1"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\PolygonViewer.tsx": {
+    "mtime": 1789753725.0276966,
+    "hash": "ec49838e9ef934cbdd1006268cf98ed4"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ResultsDashboard.tsx": {
+    "mtime": 1789753725.0296936,
+    "hash": "df6172b799e476d95fdaf271956cadb7"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\RuleConfiguration.tsx": {
+    "mtime": 1789753725.0306969,
+    "hash": "fa0a1be58c3dcd4d4ddaa3c32de0ccfb"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ScoreCard.tsx": {
+    "mtime": 1789753725.031692,
+    "hash": "6af426a1c97dfc770b3f9c6738f42e72"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\SkeletonAnnotationPage.tsx": {
+    "mtime": 1789753725.0336952,
+    "hash": "0e3653cc0f53ac1f9bf85b2a4057c2ee"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\SkeletonViewer.tsx": {
+    "mtime": 1789753725.0347092,
+    "hash": "9a84e68c61c87103f4bfedcc271290ec"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ThemeToggle.tsx": {
+    "mtime": 1789753725.035701,
+    "hash": "7d1b568b75c2049c1f0fb17a9ef8b696"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\accordion.tsx": {
+    "mtime": 1789753725.037701,
+    "hash": "999a886df2d125c7364a318304a65191"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\alert-dialog.tsx": {
+    "mtime": 1789753725.0396907,
+    "hash": "747a0c604004e46ee8e9dd4891a35cce"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\alert.tsx": {
+    "mtime": 1789753725.042705,
+    "hash": "59e3895ea793fed08d8d9f0f83ad13df"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\avatar.tsx": {
+    "mtime": 1789753725.0437968,
+    "hash": "89f1b4ec930c44c54ad1e9ac169d7020"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\badge.tsx": {
+    "mtime": 1789753725.0467045,
+    "hash": "97336e1c209ea81c33bfb14481fe530d"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\button.tsx": {
+    "mtime": 1789753725.0477605,
+    "hash": "36d6f052a4091e9d9b3df7cd774888f8"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\calendar.tsx": {
+    "mtime": 1789753725.0496905,
+    "hash": "8280b0b2c6c5d85780bfb25046d47ee6"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\card.tsx": {
+    "mtime": 1789753725.0506933,
+    "hash": "697d11f0654f32ce6daa3b6f9af3b0fe"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\carousel.tsx": {
+    "mtime": 1789753725.0526915,
+    "hash": "b050d2c1ba497c641ad7c4c538a0bd95"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\chart.tsx": {
+    "mtime": 1789753725.053691,
+    "hash": "1c36a79c1ee208a2726ea4b34a8bf5cf"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\checkbox.tsx": {
+    "mtime": 1789753725.0558348,
+    "hash": "c6c1095ad2efdd82babcdeda23454c46"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\collapsible.tsx": {
+    "mtime": 1789753725.0558348,
+    "hash": "cb66adfc183b69da16a00c9e5ddf1fb2"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\dialog.tsx": {
+    "mtime": 1789753725.0576923,
+    "hash": "08591310866072cdbdda0457d9ad510c"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\dropdown-menu.tsx": {
+    "mtime": 1789753725.058704,
+    "hash": "d048be0171f160f4faa01ee87e17ce28"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\form.tsx": {
+    "mtime": 1789753725.058704,
+    "hash": "972653ffab598d32299cc6467dc90a62"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\input.tsx": {
+    "mtime": 1789753725.0597556,
+    "hash": "f89250951479cc7f58a89475f50c45bd"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\label.tsx": {
+    "mtime": 1789753725.060808,
+    "hash": "a82ec35cf363a42512246117aeb61897"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\menubar.tsx": {
+    "mtime": 1789753725.0617926,
+    "hash": "4ea324bf925bfac1d0e17370b369c67c"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\popover.tsx": {
+    "mtime": 1789753725.0628252,
+    "hash": "8f2a759975424d02d19f702277c7d14f"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\progress.tsx": {
+    "mtime": 1789753725.0637739,
+    "hash": "3b55993b81716f20c623ac93cd3c6971"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\radio-group.tsx": {
+    "mtime": 1789753725.0647018,
+    "hash": "fc71eabdf51e6ac50bf19ddbf514f0df"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\scroll-area.tsx": {
+    "mtime": 1789753725.0676916,
+    "hash": "3087f329a403714a59102c681d82a182"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\select.tsx": {
+    "mtime": 1789753725.0686939,
+    "hash": "07f2301f393f867e06a0d64c34a23dd4"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\separator.tsx": {
+    "mtime": 1789753725.0696926,
+    "hash": "a554485146f11e2f99567142c3eea40a"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\sheet.tsx": {
+    "mtime": 1789753725.0716937,
+    "hash": "fc637f79433ea9d829e8c6b1d4df983a"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\sidebar.tsx": {
+    "mtime": 1789753725.0726922,
+    "hash": "dee42835df9290ea7dc188227868de56"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\skeleton.tsx": {
+    "mtime": 1789753725.0736926,
+    "hash": "0166abaa35206d438bd5ac705fb5dfb7"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\slider.tsx": {
+    "mtime": 1789753725.0766962,
+    "hash": "bdf76093fc0ce4bc0fa48177275f5167"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\switch.tsx": {
+    "mtime": 1789753725.0777457,
+    "hash": "6ad4b53d64d8c73798cb71f1c6f3e1ba"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\table.tsx": {
+    "mtime": 1789753725.078707,
+    "hash": "554e91a3c4302c898342d712f80c3718"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\tabs.tsx": {
+    "mtime": 1789753725.0837789,
+    "hash": "757304383216f297885d99adc3205f99"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\textarea.tsx": {
+    "mtime": 1789753725.084751,
+    "hash": "92fa0253cf8432107e75f4fdee0ecb20"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\toast.tsx": {
+    "mtime": 1789753725.0858023,
+    "hash": "5c7c1ac18b49d8e42f0c0c400e242a86"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\toaster.tsx": {
+    "mtime": 1789753725.0866935,
+    "hash": "5a2732f0e35bf8887a394ad57c86ef0f"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\components\\ui\\tooltip.tsx": {
+    "mtime": 1789753725.0886998,
+    "hash": "bc2e2a293268aa7f49c511658c4f3190"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\hooks\\use-mobile.tsx": {
+    "mtime": 1789753725.0901723,
+    "hash": "654e2ca2e9fddc27eb7e3954900dc48e"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\hooks\\use-toast.ts": {
+    "mtime": 1789753725.090848,
+    "hash": "4fd00028cb181c44efb5b049c470426c"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\lib\\cvat-xml-parser.ts": {
+    "mtime": 1789753725.0917926,
+    "hash": "c8fdfc22a4733a8d107ff764f0850a54"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\lib\\cvator-xml-parser.ts": {
+    "mtime": 1789753725.092835,
+    "hash": "6b0ddc193d08b60f636310029a4659c9"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\lib\\evaluator.ts": {
+    "mtime": 1789753725.092835,
+    "hash": "4c87173c9c6727d9d0d8ba59df2f9410"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\lib\\polygon-evaluator.ts": {
+    "mtime": 1789753725.0948672,
+    "hash": "8cbce02db8065dae19565559f4fc1c04"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\lib\\types.ts": {
+    "mtime": 1789753725.0959084,
+    "hash": "60c608d7443061c1ed7c7951f67d6810"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\lib\\utils.ts": {
+    "mtime": 1789753725.0978172,
+    "hash": "1d8011eb18769078bf77502b220daa5e"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\apphosting.yaml": {
+    "mtime": 1789753724.9791286,
+    "hash": "1d6f85711976bffb50650b05fabaa94b"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\bottleneck.md": {
+    "mtime": 1789753724.9811282,
+    "hash": "98226d34812ac1e221120413f3933e16"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\features.md": {
+    "mtime": 1789753724.9871316,
+    "hash": "092d7a769fc15e9992013e909f481887"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\formula.md": {
+    "mtime": 1789753724.9891367,
+    "hash": "49d02dc6b2b5b3c579cab2020afe739b"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\PROJECT_OVERVIEW.md": {
+    "mtime": 1789762632.7371898,
+    "hash": "ca0321759f43b33e50672f26bb65b8cf"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\README.md": {
+    "mtime": 1789753724.9771366,
+    "hash": "bda7dd5c563b56f9c30b8f441bd6acb1"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\README1.md": {
+    "mtime": 1789753724.9781303,
+    "hash": "da149fedbbab9d5923c642b5d2d9b27b"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\docs\\blueprint.md": {
+    "mtime": 1789753724.985126,
+    "hash": "9d81b22d402347563fef52ecc651ccc8"
+  },
+  "C:\\Users\\Aakash\\Documents\\PROJECT WEB\\orchvate\\AI_ANNOTATE\\Ai_Annotator\\src\\changes.md": {
+    "mtime": 1789753725.012766,
+    "hash": "7fd8e5b6656ec736350542a214471a7a"
+  }
+}

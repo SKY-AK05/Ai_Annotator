@@ -28,7 +28,9 @@ export type EvalSchemaInput = z.infer<typeof EvalSchemaInputSchema>;
 
 export interface FormValues {
   gtFile: FileList;
-  studentFiles: FileList;
+  cvatTaskIds: string;
+  cvatApiUrl: string;
+  cvatApiKey: string;
   imageFiles?: FileList;
   toolType: string;
 }

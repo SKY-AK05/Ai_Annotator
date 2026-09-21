@@ -23,12 +23,14 @@ export interface EvaluationJobData {
     evalSchema: EvalSchema;
     toolType: string;
     scoreOverrides: ScoreOverrides;
-    studentFiles: { name: string; content: string }[];
+    cvatTaskIds: string;
+    cvatApiUrl: string;
+    cvatApiKey: string;
 }
 
 export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('EvaluationQueue', async (job) => {
     const data = job.data as EvaluationJobData;
-    const { gtFileContent, evalSchema, toolType, scoreOverrides, studentFiles } = data;
+    const { gtFileContent, evalSchema, toolType, scoreOverrides, cvatTaskIds, cvatApiUrl, cvatApiKey } = data;
     
     const isXmlFile = (content: string) => content.trim().startsWith('<?xml');
 
@@ -40,9 +42,62 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
     }
 
     const batchResults: EvaluationResult[] = [];
-    const totalFiles = studentFiles.length;
+    const taskIds = cvatTaskIds.split(',').map(id => id.trim()).filter(Boolean);
+    const totalFiles = taskIds.length;
+
+    // We'll dynamically import JSZip since it might not be imported at the top
+    const JSZip = (await import('jszip')).default;
+    
+    const studentFiles: { name: string; content: string }[] = [];
+
+    for (const taskId of taskIds) {
+        await job.updateProgress(Math.round(((taskIds.indexOf(taskId)) / totalFiles) * 50));
+        
+        let fileBuffer: ArrayBuffer | null = null;
+        let attempts = 0;
+        
+        while (attempts < 20) {
+            const res = await fetch(`${cvatApiUrl}/api/tasks/${taskId}/annotations?format=COCO%201.0&action=download`, {
+                headers: {
+                    'Authorization': `Token ${cvatApiKey}`
+                }
+            });
+            
+            if (res.status === 200 || res.status === 201) {
+                fileBuffer = await res.arrayBuffer();
+                break;
+            } else if (res.status === 202) {
+                // Accepted, still processing. Wait 2 seconds and retry.
+                await new Promise(r => setTimeout(r, 2000));
+                attempts++;
+            } else {
+                throw new Error(`CVAT API Error for Task ${taskId}: ${res.statusText}`);
+            }
+        }
+        
+        if (!fileBuffer) {
+            throw new Error(`Timed out waiting for CVAT Task ${taskId} annotations export.`);
+        }
+
+        const zip = await JSZip.loadAsync(fileBuffer);
+        let content: string | null = null;
+        
+        for (const filename in zip.files) {
+            if (filename.endsWith('.json')) {
+                content = await zip.files[filename].async('string');
+                break;
+            }
+        }
+        
+        if (!content) {
+            throw new Error(`Could not find a COCO JSON file in the export for Task ${taskId}.`);
+        }
+        
+        studentFiles.push({ name: `Task_${taskId}.json`, content });
+    }
 
     for (let i = 0; i < studentFiles.length; i++) {
+        await job.updateProgress(50 + Math.round((i / studentFiles.length) * 50));
         const studentFile = studentFiles[i];
         const studentFileContent = studentFile.content;
         let studentAnnotations: CocoJson;
