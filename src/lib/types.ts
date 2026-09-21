@@ -157,6 +157,7 @@ export interface EvaluationResult {
   attribute_accuracy: AttributeAccuracy;
   critical_issues: string[];
   image_results: ImageEvaluationResult[];
+  extractedImages?: {name: string, url: string}[];
 }
 
 

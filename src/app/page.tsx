@@ -32,6 +32,7 @@ export default function Home() {
   const [feedbackCache, setFeedbackCache] = useState<Map<string, Feedback>>(new Map());
   const [scoreOverrides, setScoreOverrides] = useState<ScoreOverrides>({});
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -232,6 +233,7 @@ export default function Home() {
     setFeedback(null);
     setFeedbackCache(new Map());
     setEvaluationError(null);
+    setProgress(0);
 
     try {
         let currentGtContent = gtFileContent;
@@ -360,23 +362,30 @@ export default function Home() {
         
         toast({ title: "Job Queued", description: "Waiting for background processing..." });
 
-        // Polling loop
-        let isComplete = false;
-        while (!isComplete) {
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Poll every 2 seconds
+        let attempts = 0;
+        while(attempts < 120) {
+            await new Promise(r => setTimeout(r, 2000));
             
             const statusRes = await fetch(`/api/evaluate/status?jobId=${jobId}`);
-            if (!statusRes.ok) {
-                const errData = await statusRes.json();
-                throw new Error(errData.error || 'Failed to poll status');
-            }
+            if (!statusRes.ok) throw new Error('Failed to check job status');
             
             const statusData = await statusRes.json();
             
             if (statusData.status === 'completed') {
-                isComplete = true;
                 const batchResults: EvaluationResult[] = statusData.batchResults;
                 
+                // Collect any server-extracted images and add them to imageUrls
+                const updatedImageUrls = new Map(newImageUrls);
+                batchResults.forEach(result => {
+                    if (result.extractedImages) {
+                        result.extractedImages.forEach(img => {
+                            // CVAT images might be nested in folders like data/images/etc, just use basename as key
+                            updatedImageUrls.set(img.name, img.url);
+                        });
+                    }
+                });
+                
+                setImageUrls(updatedImageUrls);
                 setResults(batchResults);
                 prefetchAndCacheFeedback(batchResults);
                 
@@ -384,9 +393,11 @@ export default function Home() {
                     title: "Batch Evaluation Complete",
                     description: `Successfully evaluated ${batchResults.length} student files. Caching feedback...`,
                 });
+                break;
             } else if (statusData.status === 'failed') {
                 throw new Error(statusData.error || 'Job failed on the server');
             } else {
+                setProgress(statusData.progress || 0);
                 toast({
                     title: "Evaluating...",
                     description: `Progress: ${statusData.progress || 0}%`,
@@ -548,6 +559,7 @@ export default function Home() {
               <ResultsDashboard
                   results={results}
                   loading={isLoading || isGeneratingRules}
+                  progress={progress}
                   imageUrls={imageUrls}
                   onEvaluate={handleEvaluate}
                   onGtFileChange={handleGtFileChange}

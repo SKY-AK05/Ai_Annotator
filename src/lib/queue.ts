@@ -2,6 +2,8 @@ import { Queue, Worker } from 'bullmq';
 import { evaluateAnnotations, recalculateOverallScore } from './evaluator';
 import { parseCvatXml } from './cvat-xml-parser';
 import { parseUniversalBboxDataset } from './universal-bbox-parser';
+import fs from 'fs/promises';
+import path from 'path';
 import type { CocoJson, EvalSchema, EvaluationResult, ScoreOverrides } from './types';
 
 const connection = {
@@ -44,7 +46,7 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
 
     const batchResults: EvaluationResult[] = [];
     
-    let studentFiles: { name: string; content: string }[] = [];
+    let studentFiles: { name: string; content: string; extractedImages?: {name: string, url: string}[] }[] = [];
     
     if (extractedStudentFiles && extractedStudentFiles.length > 0) {
         studentFiles = extractedStudentFiles;
@@ -62,7 +64,8 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
             let attempts = 0;
             
             while (attempts < 20) {
-                const res = await fetch(`${cvatApiUrl}/api/tasks/${taskId}/annotations?format=COCO%201.0&action=download`, {
+                // Change to fetch the full dataset instead of just annotations to get images
+                const res = await fetch(`${cvatApiUrl}/api/tasks/${taskId}/dataset?format=COCO%201.0&action=download`, {
                     headers: {
                         'Authorization': `Bearer ${cvatApiKey}`
                     }
@@ -86,11 +89,27 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
 
             const zip = await JSZip.loadAsync(fileBuffer);
             let content: string | null = null;
+            const extractedImages: {name: string, url: string}[] = [];
+            
+            // Create a dedicated folder for this job and task
+            const jobImagesDir = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), String(taskId));
+            await fs.mkdir(jobImagesDir, { recursive: true });
             
             for (const filename in zip.files) {
                 if (filename.endsWith('.json') || filename.endsWith('.xml')) {
                     content = await zip.files[filename].async('string');
-                    break;
+                } else if (!zip.files[filename].dir && filename.match(/\.(jpe?g|png|gif|webp)$/i)) {
+                    // Extract image
+                    const imageBuffer = await zip.files[filename].async('nodebuffer');
+                    const basename = path.basename(filename);
+                    const destPath = path.join(jobImagesDir, basename);
+                    await fs.writeFile(destPath, imageBuffer);
+                    
+                    // The URL is relative to the public directory
+                    extractedImages.push({
+                        name: basename,
+                        url: `/cvat-images/${job.id}/${taskId}/${basename}`
+                    });
                 }
             }
             
@@ -98,7 +117,11 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
                 throw new Error(`Could not find an annotation file in the export for Task ${taskId}.`);
             }
             
-            studentFiles.push({ name: `Task_${taskId}`, content });
+            studentFiles.push({ 
+                name: `Task_${taskId}`, 
+                content,
+                extractedImages
+            });
         }
     }
 
@@ -117,9 +140,12 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
         }
     
         const initialResult = evaluateAnnotations(gtAnnotations, evalSchema, studentAnnotations);
+        
+        // Pass the extracted images through to the final result if they exist
         const finalResult = recalculateOverallScore({
              ...initialResult,
             studentFilename: studentFile.name,
+            extractedImages: (studentFile as any).extractedImages || []
         }, scoreOverrides);
 
         batchResults.push(finalResult);

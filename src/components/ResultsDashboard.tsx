@@ -18,10 +18,12 @@ import { EvaluationForm } from "./EvaluationForm";
 import { RuleConfiguration } from "./RuleConfiguration";
 import { cn } from '@/lib/utils';
 import { EditableScoreCell } from './EditableScoreCell';
+import { Progress } from "@/components/ui/progress";
 
 interface ResultsDashboardProps {
   results: EvaluationResult[] | null;
   loading: boolean;
+  progress?: number;
   imageUrls: Map<string, string>;
   onEvaluate: (data: FormValues) => void;
   onGtFileChange: (file: File | undefined) => void;
@@ -477,7 +479,7 @@ const SingleResultDisplay = ({ result, imageUrls, selectedAnnotation, onAnnotati
     );
 };
 
-export function ResultsDashboard({ results, loading, imageUrls, onEvaluate, onGtFileChange, evalSchema, onRuleChange, selectedAnnotation, onAnnotationSelect, feedback, onScoreOverride, evaluationError }: ResultsDashboardProps) {
+export function ResultsDashboard({ results, loading, progress = 0, imageUrls, onEvaluate, onGtFileChange, evalSchema, onRuleChange, selectedAnnotation, onAnnotationSelect, feedback, onScoreOverride, evaluationError }: ResultsDashboardProps) {
   const [openAccordion, setOpenAccordion] = React.useState<string[]>([]);
 
   React.useEffect(() => {
@@ -538,8 +540,10 @@ export function ResultsDashboard({ results, loading, imageUrls, onEvaluate, onGt
             {loading && !results ? (
                 <div className="flex flex-col items-center justify-center text-center p-8 h-full min-h-[300px] border-dashed border-2 rounded-md bg-card">
                     <FileQuestion className="h-16 w-16 text-muted-foreground mb-4 animate-pulse" />
-                    <h3 className="text-xl font-semibold text-foreground">Evaluating...</h3>
-                    <p className="text-muted-foreground mt-2">The results will appear here once the evaluation is complete.</p>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Evaluating...</h3>
+                    <Progress value={progress} className="w-[60%] max-w-[300px] h-2 mb-2" />
+                    <p className="text-muted-foreground">{progress}% Complete</p>
+                    <p className="text-muted-foreground mt-2 text-sm">Large CVAT datasets with images may take several minutes to download.</p>
                 </div>
             ) : evaluationError ? (
                 <div className="flex flex-col items-center justify-center text-center p-8 h-full min-h-[300px] border-dashed border-2 border-destructive/50 rounded-md bg-destructive/10">
