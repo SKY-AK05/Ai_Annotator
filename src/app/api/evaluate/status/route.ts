@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
-import { evaluationQueue } from '@/lib/queue';
+import { evaluationQueue, downloadQueue } from '@/lib/queue';
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const jobId = searchParams.get('jobId');
+        const type = searchParams.get('type');
 
         if (!jobId) {
             return NextResponse.json({ error: 'jobId is required' }, { status: 400 });
         }
 
-        const job = await evaluationQueue.getJob(jobId);
+        const queue = type === 'download' ? downloadQueue : evaluationQueue;
+        const job = await queue.getJob(jobId);
 
         if (!job) {
             return NextResponse.json({ error: 'Job not found' }, { status: 404 });

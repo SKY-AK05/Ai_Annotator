@@ -36,7 +36,9 @@ export interface FormValues {
   cvatApiUrl: string;
   cvatApiKey: string;
   imageFiles?: FileList;
-  toolType: string;
+  toolType?: string;
+  gtDownloadedPath?: string | null;
+  studentDownloadedPaths?: string[];
 }
 
 export interface CocoCategory {

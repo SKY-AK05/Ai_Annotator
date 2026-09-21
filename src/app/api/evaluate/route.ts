@@ -16,13 +16,16 @@ export async function POST(request: Request) {
         const cvatApiUrl = formData.get('cvatApiUrl') as string | null;
         const cvatApiKey = formData.get('cvatApiKey') as string | null;
         const studentFilesData = formData.getAll('studentFiles') as File[];
+        
+        const gtDownloadedPath = formData.get('gtDownloadedPath') as string | null;
+        const studentDownloadedPaths = formData.getAll('studentDownloadedPaths') as string[];
 
-        if (!gtFileContent || !evalSchemaStr) {
-            return NextResponse.json({ error: 'Missing required fields for evaluation' }, { status: 400 });
+        if (!gtFileContent && !gtDownloadedPath) {
+            return NextResponse.json({ error: 'Missing GT file content or downloaded path' }, { status: 400 });
         }
         
-        if (studentFilesData.length === 0 && (!cvatTaskIds || !cvatApiUrl || !cvatApiKey)) {
-             return NextResponse.json({ error: 'Missing CVAT API details or Student Files' }, { status: 400 });
+        if (studentFilesData.length === 0 && studentDownloadedPaths.length === 0 && (!cvatTaskIds || !cvatApiUrl || !cvatApiKey)) {
+             return NextResponse.json({ error: 'Missing CVAT API details, Student Files, or Downloaded Paths' }, { status: 400 });
         }
 
         const evalSchema = JSON.parse(evalSchemaStr) as EvalSchema;
@@ -52,7 +55,9 @@ export async function POST(request: Request) {
             cvatTaskIds: cvatTaskIds || '',
             cvatApiUrl: cvatApiUrl || '',
             cvatApiKey: cvatApiKey || '',
-            extractedStudentFiles
+            extractedStudentFiles,
+            gtDownloadedPath: gtDownloadedPath || undefined,
+            studentDownloadedPaths: studentDownloadedPaths.length > 0 ? studentDownloadedPaths : undefined
         });
 
         return NextResponse.json({ jobId: job.id, status: 'queued' });

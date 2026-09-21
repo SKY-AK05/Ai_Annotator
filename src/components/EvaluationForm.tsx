@@ -4,8 +4,9 @@ import * as React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, CheckSquare, Link as LinkIcon, Eye, EyeOff } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, CheckSquare, Link as LinkIcon, Eye, EyeOff, DownloadCloud } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Progress } from "@/components/ui/progress";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -50,6 +51,7 @@ interface EvaluationFormProps {
 
 export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrls }: EvaluationFormProps) {
   const { toast } = useToast();
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Modes
   const [gtSourceMode, setGtSourceMode] = useState<'file' | 'api'>('file');
@@ -84,6 +86,15 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [isFetchingStudentTasks, setIsFetchingStudentTasks] = useState(false);
   const [studentTaskSearch, setStudentTaskSearch] = useState('');
   const [studentProjectSearch, setStudentProjectSearch] = useState('');
+
+  // Download State
+  const [gtDownloadJobId, setGtDownloadJobId] = useState<string | null>(null);
+  const [gtDownloadProgress, setGtDownloadProgress] = useState(0);
+  const [gtDownloadedPath, setGtDownloadedPath] = useState<string | null>(null);
+  
+  const [studentDownloadJobId, setStudentDownloadJobId] = useState<string | null>(null);
+  const [studentDownloadProgress, setStudentDownloadProgress] = useState(0);
+  const [studentDownloadedPaths, setStudentDownloadedPaths] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -128,6 +139,107 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
     fetchOrgsWithArgs(cvatApiUrl, cvatApiKey);
     fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, '');
   };
+
+  const pullData = async (target: 'gt' | 'student') => {
+      const taskIds = target === 'gt' ? gtSelectedTaskIds : studentSelectedTaskIds;
+      if (taskIds.size === 0) return;
+      
+      const setterJobId = target === 'gt' ? setGtDownloadJobId : setStudentDownloadJobId;
+      const setterProgress = target === 'gt' ? setGtDownloadProgress : setStudentDownloadProgress;
+      const setterPath = target === 'gt' ? setGtDownloadedPath : (p: any) => setStudentDownloadedPaths(prev => [...prev, p]);
+      
+      if (target === 'student') {
+          setStudentDownloadedPaths([]); // Reset on new pull
+      } else {
+          setGtDownloadedPath(null);
+      }
+      
+      setterProgress(0);
+      
+      try {
+          const res = await fetch('/api/pull-data', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  cvatTaskIds: Array.from(taskIds).join(','),
+                  cvatApiUrl,
+                  cvatApiKey,
+                  type: target
+              })
+          });
+          if (!res.ok) throw new Error("Failed to start pull job");
+          const data = await res.json();
+          setterJobId(data.jobId);
+      } catch (err: any) {
+          toast({ title: "Error starting download", description: err.message });
+      }
+  };
+
+  useEffect(() => {
+      const checkStatus = async () => {
+          let jobsActive = false;
+          
+          if (gtDownloadJobId) {
+              jobsActive = true;
+              try {
+                  const res = await fetch(`/api/evaluate/status?jobId=${gtDownloadJobId}&type=download`);
+                  const data = await res.json();
+                  if (data.status === 'completed') {
+                      setGtDownloadedPath(data.batchResults.manifestPath);
+                      setGtDownloadJobId(null);
+                      setGtDownloadProgress(100);
+                      toast({ title: "GT Download Complete!" });
+                  } else if (data.status === 'failed') {
+                      setGtDownloadJobId(null);
+                      toast({ title: "GT Download Failed", description: data.error, variant: "destructive" });
+                  } else {
+                      setGtDownloadProgress(data.progress || 0);
+                  }
+              } catch (e) {
+                  console.error(e);
+              }
+          }
+          
+          if (studentDownloadJobId) {
+              jobsActive = true;
+              try {
+                  const res = await fetch(`/api/evaluate/status?jobId=${studentDownloadJobId}&type=download`);
+                  const data = await res.json();
+                  if (data.status === 'completed') {
+                      setStudentDownloadedPaths([data.batchResults.manifestPath]);
+                      setStudentDownloadJobId(null);
+                      setStudentDownloadProgress(100);
+                      toast({ title: "Student Download Complete!" });
+                  } else if (data.status === 'failed') {
+                      setStudentDownloadJobId(null);
+                      toast({ title: "Student Download Failed", description: data.error, variant: "destructive" });
+                  } else {
+                      setStudentDownloadProgress(data.progress || 0);
+                  }
+              } catch (e) {
+                  console.error(e);
+              }
+          }
+          
+          if (!jobsActive && pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+          }
+      };
+
+      if (gtDownloadJobId || studentDownloadJobId) {
+          if (!pollIntervalRef.current) {
+              pollIntervalRef.current = setInterval(checkStatus, 1000);
+          }
+      }
+      
+      return () => {
+          if (pollIntervalRef.current && !gtDownloadJobId && !studentDownloadJobId) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+          }
+      };
+  }, [gtDownloadJobId, studentDownloadJobId]);
 
   const fetchOrgsWithArgs = async (url: string, key: string) => {
     const trimmedKey = key?.trim();
@@ -192,11 +304,13 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
           setGtSelectedProjectId('');
           setGtTasks([]);
           setGtSelectedTaskIds(new Set());
+          setGtDownloadedPath(null);
       } else {
           setStudentSelectedOrgId(org);
           setStudentSelectedProjectId('');
           setStudentTasks([]);
           setStudentSelectedTaskIds(new Set());
+          setStudentDownloadedPaths([]);
       }
       const actualOrg = org === 'personal' ? '' : org;
       fetchProjectsWithArgs(cvatApiUrl, cvatApiKey, actualOrg);
@@ -284,12 +398,20 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
         toast({ title: "Missing Ground Truth", description: "Please select at least one CVAT task for Ground Truth." });
         return;
     }
+    if (gtSourceMode === 'api' && !gtDownloadedPath) {
+        toast({ title: "Missing Data", description: "Please click 'Pull Ground Truth Data' and wait for it to finish." });
+        return;
+    }
     if (studentSourceMode === 'file' && (!values.studentFiles || values.studentFiles.length === 0)) {
         toast({ title: "Missing Student Data", description: "Please upload at least one Student file." });
         return;
     }
     if (studentSourceMode === 'api' && studentSelectedTaskIds.size === 0) {
         toast({ title: "Missing Student Data", description: "Please select at least one CVAT task for Student Data." });
+        return;
+    }
+    if (studentSourceMode === 'api' && studentDownloadedPaths.length === 0) {
+        toast({ title: "Missing Data", description: "Please click 'Pull Student Data' and wait for it to finish." });
         return;
     }
     
@@ -309,6 +431,8 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
       cvatApiKey: cvatApiKey.trim(),
       imageFiles: values.imageFiles,
       toolType: values.toolType,
+      gtDownloadedPath,
+      studentDownloadedPaths
     });
   }
 
@@ -512,6 +636,30 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                             </div>
                                         </div>
                                     )}
+                                    {gtTasks.length > 0 && gtSelectedTaskIds.size > 0 && (
+                                        <div className="pt-2">
+                                            <Button 
+                                                type="button" 
+                                                onClick={() => pullData('gt')} 
+                                                disabled={gtDownloadJobId !== null || gtDownloadedPath !== null}
+                                                className="w-full text-xs h-8 border-2 border-foreground shadow-hard font-bold"
+                                            >
+                                                {gtDownloadJobId ? (
+                                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Pulling...</>
+                                                ) : gtDownloadedPath ? (
+                                                    <><CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Ready</>
+                                                ) : (
+                                                    <><DownloadCloud className="mr-2 h-4 w-4" /> Pull Ground Truth Data</>
+                                                )}
+                                            </Button>
+                                            {gtDownloadJobId && (
+                                                <div className="mt-2 space-y-1">
+                                                    <Progress value={gtDownloadProgress} className="h-2 border-2 border-foreground" />
+                                                    <p className="text-[10px] text-center text-muted-foreground">{gtDownloadProgress}% Complete</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -649,6 +797,30 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                                     </div>
                                                 ))}
                                             </div>
+                                        </div>
+                                    )}
+                                    {studentTasks.length > 0 && studentSelectedTaskIds.size > 0 && (
+                                        <div className="pt-2">
+                                            <Button 
+                                                type="button" 
+                                                onClick={() => pullData('student')} 
+                                                disabled={studentDownloadJobId !== null || studentDownloadedPaths.length > 0}
+                                                className="w-full text-xs h-8 border-2 border-foreground shadow-hard font-bold"
+                                            >
+                                                {studentDownloadJobId ? (
+                                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Pulling...</>
+                                                ) : studentDownloadedPaths.length > 0 ? (
+                                                    <><CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Ready</>
+                                                ) : (
+                                                    <><DownloadCloud className="mr-2 h-4 w-4" /> Pull Student Data</>
+                                                )}
+                                            </Button>
+                                            {studentDownloadJobId && (
+                                                <div className="mt-2 space-y-1">
+                                                    <Progress value={studentDownloadProgress} className="h-2 border-2 border-foreground" />
+                                                    <p className="text-[10px] text-center text-muted-foreground">{studentDownloadProgress}% Complete</p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
