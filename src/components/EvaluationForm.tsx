@@ -5,7 +5,7 @@ import * as React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, CheckSquare, Link as LinkIcon } from 'lucide-react';
+import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, CheckSquare, Link as LinkIcon, Eye, EyeOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [cvatApiUrl, setCvatApiUrl] = useState('https://opencvat-ig.orchvate.com');
   const [cvatApiKey, setCvatApiKey] = useState('vr7wfCre.nH1E9PmNq9giisIdUVCBdajKerTPFJe7');
   const [isConfigOpen, setIsConfigOpen] = useState(true);
+  const [showApiKey, setShowApiKey] = useState(false);
   
   // Data State
   const [projects, setProjects] = useState<any[]>([]);
@@ -282,14 +283,23 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                       </div>
                       <div className="space-y-1">
                           <Label htmlFor="cvatApiKey" className="text-xs font-semibold">API Key</Label>
-                          <Input 
-                              id="cvatApiKey" 
-                              type="password"
-                              value={cvatApiKey} 
-                              onChange={(e) => setCvatApiKey(e.target.value)} 
-                              placeholder="Enter your API token..."
-                              className="h-8 text-xs border-2 border-foreground shadow-hard"
-                          />
+                          <div className="relative">
+                            <Input 
+                                id="cvatApiKey" 
+                                type={showApiKey ? "text" : "password"}
+                                value={cvatApiKey} 
+                                onChange={(e) => setCvatApiKey(e.target.value)} 
+                                placeholder="Enter your API token..."
+                                className="h-8 text-xs border-2 border-foreground shadow-hard pr-8"
+                            />
+                            <button 
+                                type="button" 
+                                onClick={() => setShowApiKey(!showApiKey)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                                {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                          </div>
                       </div>
                       <Button type="button" onClick={saveConfig} variant="secondary" size="sm" className="w-full text-xs font-bold border-2 border-foreground shadow-hard">
                           Save & Connect
