@@ -71,6 +71,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [gtSelectedTaskIds, setGtSelectedTaskIds] = useState<Set<number>>(new Set());
   const [isFetchingGtTasks, setIsFetchingGtTasks] = useState(false);
   const [gtTaskSearch, setGtTaskSearch] = useState('');
+  const [gtProjectSearch, setGtProjectSearch] = useState('');
 
   // Student State
   const [studentSelectedProjectId, setStudentSelectedProjectId] = useState<string>('');
@@ -78,6 +79,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [studentSelectedTaskIds, setStudentSelectedTaskIds] = useState<Set<number>>(new Set());
   const [isFetchingStudentTasks, setIsFetchingStudentTasks] = useState(false);
   const [studentTaskSearch, setStudentTaskSearch] = useState('');
+  const [studentProjectSearch, setStudentProjectSearch] = useState('');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -380,9 +382,21 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                         <SelectValue placeholder="Choose a project..." />
                                     </SelectTrigger>
                                     <SelectContent className="card-style">
-                                        {projects.map(p => (
+                                        <div className="p-2 border-b">
+                                            <Input 
+                                                placeholder="Search projects..." 
+                                                className="h-7 text-xs border-foreground"
+                                                value={gtProjectSearch}
+                                                onChange={(e) => setGtProjectSearch(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                        {projects.filter(p => p.name.toLowerCase().includes(gtProjectSearch.toLowerCase())).map(p => (
                                             <SelectItem key={p.id} value={p.id.toString()} className="text-xs">{p.name} (ID: {p.id})</SelectItem>
                                         ))}
+                                        {projects.filter(p => p.name.toLowerCase().includes(gtProjectSearch.toLowerCase())).length === 0 && (
+                                            <div className="p-2 text-xs text-muted-foreground text-center">No projects found.</div>
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -491,9 +505,21 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                         <SelectValue placeholder="Choose a project..." />
                                     </SelectTrigger>
                                     <SelectContent className="card-style">
-                                        {projects.map(p => (
+                                        <div className="p-2 border-b">
+                                            <Input 
+                                                placeholder="Search projects..." 
+                                                className="h-7 text-xs border-foreground"
+                                                value={studentProjectSearch}
+                                                onChange={(e) => setStudentProjectSearch(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                        {projects.filter(p => p.name.toLowerCase().includes(studentProjectSearch.toLowerCase())).map(p => (
                                             <SelectItem key={p.id} value={p.id.toString()} className="text-xs">{p.name} (ID: {p.id})</SelectItem>
                                         ))}
+                                        {projects.filter(p => p.name.toLowerCase().includes(studentProjectSearch.toLowerCase())).length === 0 && (
+                                            <div className="p-2 text-xs text-muted-foreground text-center">No projects found.</div>
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
