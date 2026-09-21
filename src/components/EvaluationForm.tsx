@@ -108,7 +108,8 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   };
 
   const fetchProjectsWithArgs = async (url: string, key: string) => {
-    if (!key || !url) {
+    const trimmedKey = key?.trim();
+    if (!trimmedKey || !url) {
         toast({ title: "Configuration Required", description: "Please enter API URL and Key." });
         return;
     }
@@ -118,7 +119,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
         const res = await fetch('/api/cvat/projects', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key })
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey })
         });
         
         if (!res.ok) {
@@ -150,10 +151,11 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
     setIsFetchingTasks(true);
     setSelectedTaskIds(new Set()); // Reset selections
     try {
+        const trimmedKey = cvatApiKey?.trim();
         const res = await fetch('/api/cvat/tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl, cvatApiKey, projectId })
+            body: JSON.stringify({ cvatApiUrl, cvatApiKey: trimmedKey, projectId })
         });
         
         if (!res.ok) {
