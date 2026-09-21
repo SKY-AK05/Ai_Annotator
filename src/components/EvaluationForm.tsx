@@ -427,7 +427,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                     <SelectContent className="card-style">
                                         <SelectItem value="personal" className="text-xs">Personal Workspace</SelectItem>
                                         {orgs.map(o => (
-                                            <SelectItem key={o.id} value={o.slug || o.id.toString()} className="text-xs">{o.slug || o.name}</SelectItem>
+                                            <SelectItem key={o.id} value={o.id.toString()} className="text-xs">{o.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -566,7 +566,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                     <SelectContent className="card-style">
                                         <SelectItem value="personal" className="text-xs">Personal Workspace</SelectItem>
                                         {orgs.map(o => (
-                                            <SelectItem key={o.id} value={o.slug || o.id.toString()} className="text-xs">{o.slug || o.name}</SelectItem>
+                                            <SelectItem key={o.id} value={o.id.toString()} className="text-xs">{o.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
