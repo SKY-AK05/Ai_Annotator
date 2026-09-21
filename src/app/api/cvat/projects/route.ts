@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
         const res = await fetch(`${cvatApiUrl}/api/projects`, {
             headers: {
-                'Authorization': `Token ${cvatApiKey}`
+                'Authorization': `Bearer ${cvatApiKey}`
             }
         });
 
