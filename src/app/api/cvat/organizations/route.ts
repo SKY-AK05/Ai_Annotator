@@ -9,7 +9,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing CVAT credentials' }, { status: 400 });
         }
 
-        const res = await fetch(`${cvatApiUrl}/api/organizations`, {
+        const res = await fetch(`${cvatApiUrl}/api/organizations?page_size=100`, {
             headers: {
                 'Authorization': `Bearer ${cvatApiKey}`
             }

@@ -13,9 +13,9 @@ export async function POST(request: Request) {
             'Authorization': `Bearer ${cvatApiKey}`
         };
 
-        let url = `${cvatApiUrl}/api/tasks?project_id=${projectId}`;
+        let url = `${cvatApiUrl}/api/tasks?project_id=${projectId}&page_size=1000`;
         if (org) {
-            url += `&org=${encodeURIComponent(org)}`;
+            url += `&org_id=${encodeURIComponent(org)}`;
         }
 
         const res = await fetch(url, {
