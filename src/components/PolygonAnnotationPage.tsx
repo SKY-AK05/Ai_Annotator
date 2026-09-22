@@ -56,13 +56,7 @@ export default function PolygonAnnotationPage() {
                     } else if (fileInZip.name.match(/\.(jpe?g|png|gif|webp)$/i)) {
                         const blob = await fileInZip.async('blob');
                         const url = URL.createObjectURL(blob);
-                        let filename = fileInZip.name;
-                        filename = filename.replace(/^images\/default\//i, '');
-                        filename = filename.replace(/^images\/train\//i, '');
-                        filename = filename.replace(/^images\/val\//i, '');
-                        filename = filename.replace(/^images\/test\//i, '');
-                        filename = filename.replace(/^images\//i, '');
-                        filename = filename.replace(/^data\//i, '');
+                        const filename = fileInZip.name.split('/').pop()!;
                         newImageUrls.set(filename, url);
                     }
                 });
@@ -125,14 +119,7 @@ export default function PolygonAnnotationPage() {
                     const imageInZipPromises = Object.values(zip.files).map(async (zipFile) => {
                       if (!zipFile.dir && zipFile.name.match(/\.(jpe?g|png|gif|webp)$/i)) {
                         const blob = await zipFile.async('blob');
-                        let filename = zipFile.name;
-                        filename = filename.replace(/^images\/default\//i, '');
-                        filename = filename.replace(/^images\/train\//i, '');
-                        filename = filename.replace(/^images\/val\//i, '');
-                        filename = filename.replace(/^images\/test\//i, '');
-                        filename = filename.replace(/^images\//i, '');
-                        filename = filename.replace(/^data\//i, '');
-                        return { name: filename, url: URL.createObjectURL(blob) };
+                        return { name: zipFile.name.split('/').pop()!, url: URL.createObjectURL(blob) };
                       }
                       return null;
                     });

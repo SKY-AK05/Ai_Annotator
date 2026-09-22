@@ -46,6 +46,8 @@ export function parseCvatXml(xmlString: string): CocoJson {
     Array.from(xmlDoc.getElementsByTagName("image")).forEach((imageNode: Element) => {
         const imageId = parseInt(imageNode.getAttribute("id") || "0", 10);
         let imageName = imageNode.getAttribute("name") || "";
+        // Keep only the base filename
+        imageName = imageName.split('/').pop()!;
         const imageWidth = parseInt(imageNode.getAttribute("width") || "0", 10);
         const imageHeight = parseInt(imageNode.getAttribute("height") || "0", 10);
         const taskIdAttr = imageNode.getAttribute("task_id");
@@ -145,6 +147,7 @@ export function parseCvatXmlForPolygons(xmlString: string): CocoJson {
     Array.from(xmlDoc.getElementsByTagName("image")).forEach((imageNode: Element) => {
         const imageId = parseInt(imageNode.getAttribute("id") || "0", 10);
         let imageName = imageNode.getAttribute("name") || "";
+        imageName = imageName.split('/').pop()!;
         const imageWidth = parseInt(imageNode.getAttribute("width") || "0", 10);
         const imageHeight = parseInt(imageNode.getAttribute("height") || "0", 10);
         const taskIdAttr = imageNode.getAttribute("task_id");

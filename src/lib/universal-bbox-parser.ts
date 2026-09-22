@@ -190,7 +190,7 @@ export async function parseUniversalBboxDataset(fileContent: string): Promise<Co
     };
 
     const getImageId = (name: string, width: number = 1000, height: number = 1000) => {
-        const key = String(name);
+        const key = String(name).split('/').pop()!;
         if (!imageMap.has(key)) {
             const id = imageCounter++;
             const newImage = { id, file_name: key, width, height };
