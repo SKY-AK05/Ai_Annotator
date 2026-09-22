@@ -143,7 +143,13 @@ export default function Home() {
             } else if (fileInZip.name.match(/\.(jpe?g|png|gif|webp)$/i)) {
                 const blob = await fileInZip.async('blob');
                 const url = URL.createObjectURL(blob);
-                const filename = fileInZip.name.split('/').pop()!;
+                let filename = fileInZip.name;
+                filename = filename.replace(/^images\/default\//i, '');
+                filename = filename.replace(/^images\/train\//i, '');
+                filename = filename.replace(/^images\/val\//i, '');
+                filename = filename.replace(/^images\/test\//i, '');
+                filename = filename.replace(/^images\//i, '');
+                filename = filename.replace(/^data\//i, '');
                 newImageUrls.set(filename, url);
             }
         });
@@ -400,7 +406,14 @@ export default function Home() {
                 const imageInZipPromises = Object.values(zip.files).map(async (zipFile) => {
                   if (!zipFile.dir && zipFile.name.match(/\.(jpe?g|png|gif|webp)$/i)) {
                     const blob = await zipFile.async('blob');
-                    return { name: zipFile.name.split('/').pop()!, url: URL.createObjectURL(blob) };
+                    let filename = zipFile.name;
+                    filename = filename.replace(/^images\/default\//i, '');
+                    filename = filename.replace(/^images\/train\//i, '');
+                    filename = filename.replace(/^images\/val\//i, '');
+                    filename = filename.replace(/^images\/test\//i, '');
+                    filename = filename.replace(/^images\//i, '');
+                    filename = filename.replace(/^data\//i, '');
+                    return { name: filename, url: URL.createObjectURL(blob) };
                   }
                   return null;
                 });

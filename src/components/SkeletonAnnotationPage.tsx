@@ -46,7 +46,14 @@ export default function SkeletonAnnotationPage() {
                     const blob = await fileInZip.async('blob');
                     const url = URL.createObjectURL(blob);
                     setImageUrl(url); // Set the first image found as the preview
-                    setImageFile(new File([blob], fileInZip.name.split('/').pop()!));
+                    let filename = fileInZip.name;
+                    filename = filename.replace(/^images\/default\//i, '');
+                    filename = filename.replace(/^images\/train\//i, '');
+                    filename = filename.replace(/^images\/val\//i, '');
+                    filename = filename.replace(/^images\/test\//i, '');
+                    filename = filename.replace(/^images\//i, '');
+                    filename = filename.replace(/^data\//i, '');
+                    setImageFile(new File([blob], filename));
                 }
             });
             await Promise.all(filePromises);
