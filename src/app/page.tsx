@@ -237,15 +237,23 @@ export default function Home() {
     try {
         toast({ title: "Loading GT Data...", description: "Reading downloaded project data." });
         
+        // Extract the jobId from the manifestPath to construct the URL
+        const pathParts = manifestPath.replace(/\\/g, '/').split('/');
+        const manifestIndex = pathParts.indexOf('manifest.json');
+        let manifestUrl = '';
+        if (manifestIndex >= 2) {
+            manifestUrl = `/cvat-images/${pathParts[manifestIndex - 1]}/manifest.json`;
+        }
+
         const manifestRes = await fetch('/api/pull-data/read-manifest', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ manifestPath })
+            body: JSON.stringify({ manifestUrl, manifestPath })
         });
         
         if (!manifestRes.ok) {
-            const errData = await manifestRes.json();
-            throw new Error(`Failed to read manifest: ${errData.error}`);
+            const errData = await manifestRes.json().catch(() => ({}));
+            throw new Error(`Failed to read manifest: ${errData.error || manifestRes.statusText}`);
         }
         
         const manifestData = await manifestRes.json();
@@ -317,12 +325,23 @@ export default function Home() {
             if (loadedGtSourceId !== data.gtDownloadedPath) {
                 // If they haven't clicked Generate Rules, we need to do it here as a fallback
                 toast({ title: "Fetching Ground Truth...", description: "Reading downloaded GT annotations." });
+                
+                const pathParts = data.gtDownloadedPath.replace(/\\/g, '/').split('/');
+                const manifestIndex = pathParts.indexOf('manifest.json');
+                let manifestUrl = '';
+                if (manifestIndex >= 2) {
+                    manifestUrl = `/cvat-images/${pathParts[manifestIndex - 1]}/manifest.json`;
+                }
+
                 const manifestRes = await fetch('/api/pull-data/read-manifest', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ manifestPath: data.gtDownloadedPath })
+                    body: JSON.stringify({ manifestUrl: manifestUrl || undefined, manifestPath: data.gtDownloadedPath })
                 });
-                if (!manifestRes.ok) throw new Error("Failed to fetch downloaded GT manifest");
+                if (!manifestRes.ok) {
+                    const errData = await manifestRes.json().catch(() => ({}));
+                    throw new Error(`Failed to fetch downloaded GT manifest. ${errData.error || 'Check server logs.'}`);
+                }
                 const manifestData = await manifestRes.json();
                 const manifest = manifestData.manifest;
                 
