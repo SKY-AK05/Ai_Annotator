@@ -60,7 +60,7 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
     
     // 1. Trigger export
     const exportUrl = `${cvatApiUrl}/api/projects/${cvatProjectId}/dataset/export`;
-    const exportRes = await fetch(`${exportUrl}?format=COCO%201.0&save_images=true`, {
+    const exportRes = await fetch(`${exportUrl}?format=CVAT%20for%20images%201.1&save_images=true`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${cvatApiKey}` }
     });
