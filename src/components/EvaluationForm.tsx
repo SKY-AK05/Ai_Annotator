@@ -4,7 +4,7 @@ import * as React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, Eye, EyeOff, DownloadCloud } from 'lucide-react';
+import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, Eye, EyeOff, DownloadCloud, Plus, Trash2 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Progress } from "@/components/ui/progress";
 
@@ -48,6 +48,13 @@ interface EvaluationFormProps {
   imageUrls: Map<string, string>;
 }
 
+interface CvatInstance {
+    id: string;
+    name: string;
+    url: string;
+    apiKey: string;
+}
+
 export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrls }: EvaluationFormProps) {
   const { toast } = useToast();
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -56,11 +63,16 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [gtSourceMode, setGtSourceMode] = useState<'file' | 'api'>('file');
   const [studentSourceMode, setStudentSourceMode] = useState<'file' | 'api'>('api');
 
+  // Saved Instances State
+  const [savedInstances, setSavedInstances] = useState<CvatInstance[]>([]);
+  const [newInstanceName, setNewInstanceName] = useState('');
+  const [newInstanceUrl, setNewInstanceUrl] = useState('https://opencvat-ig.orchvate.com');
+  const [newInstanceKey, setNewInstanceKey] = useState('');
+  const [showNewInstanceKey, setShowNewInstanceKey] = useState(false);
+  const [isInstancesOpen, setIsInstancesOpen] = useState(true);
+
   // GT API State
-  const [gtCvatApiUrl, setGtCvatApiUrl] = useState('https://opencvat-ig.orchvate.com');
-  const [gtCvatApiKey, setGtCvatApiKey] = useState('');
-  const [gtIsConfigOpen, setGtIsConfigOpen] = useState(true);
-  const [gtShowApiKey, setGtShowApiKey] = useState(false);
+  const [gtSelectedInstanceId, setGtSelectedInstanceId] = useState<string>('');
   const [gtOrgs, setGtOrgs] = useState<any[]>([]);
   const [isFetchingGtOrgs, setIsFetchingGtOrgs] = useState(false);
   const [gtProjects, setGtProjects] = useState<any[]>([]);
@@ -70,10 +82,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [gtProjectSearch, setGtProjectSearch] = useState('');
 
   // Student API State
-  const [studentCvatApiUrl, setStudentCvatApiUrl] = useState('https://opencvat-ig.orchvate.com');
-  const [studentCvatApiKey, setStudentCvatApiKey] = useState('');
-  const [studentIsConfigOpen, setStudentIsConfigOpen] = useState(true);
-  const [studentShowApiKey, setStudentShowApiKey] = useState(false);
+  const [studentSelectedInstanceId, setStudentSelectedInstanceId] = useState<string>('');
   const [studentOrgs, setStudentOrgs] = useState<any[]>([]);
   const [isFetchingStudentOrgs, setIsFetchingStudentOrgs] = useState(false);
   const [studentProjects, setStudentProjects] = useState<any[]>([]);
@@ -104,50 +113,92 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   
   const hasImagesFromGt = imageUrls.size > 0;
 
+  // Load instances on mount
   useEffect(() => {
-    const savedGtUrl = localStorage.getItem('gtCvatApiUrl');
-    const savedGtKey = localStorage.getItem('gtCvatApiKey');
-    if (savedGtUrl) setGtCvatApiUrl(savedGtUrl);
-    if (savedGtKey) setGtCvatApiKey(savedGtKey);
-    if (savedGtUrl && savedGtKey) {
-        setGtIsConfigOpen(false);
-        fetchGtOrgs(savedGtUrl, savedGtKey);
-        fetchGtProjects(savedGtUrl, savedGtKey, '');
-    }
-
-    const savedStudentUrl = localStorage.getItem('studentCvatApiUrl');
-    const savedStudentKey = localStorage.getItem('studentCvatApiKey');
-    if (savedStudentUrl) setStudentCvatApiUrl(savedStudentUrl);
-    if (savedStudentKey) setStudentCvatApiKey(savedStudentKey);
-    if (savedStudentUrl && savedStudentKey) {
-        setStudentIsConfigOpen(false);
-        fetchStudentOrgs(savedStudentUrl, savedStudentKey);
-        fetchStudentProjects(savedStudentUrl, savedStudentKey, '');
-    }
+      const stored = localStorage.getItem('cvatSavedInstances');
+      if (stored) {
+          try {
+              const parsed = JSON.parse(stored);
+              setSavedInstances(parsed);
+              if (parsed.length > 0) {
+                  setIsInstancesOpen(false);
+              }
+          } catch (e) {
+              console.error("Failed to parse saved instances", e);
+          }
+      }
   }, []);
 
-  const saveGtConfig = () => {
-    localStorage.setItem('gtCvatApiUrl', gtCvatApiUrl);
-    localStorage.setItem('gtCvatApiKey', gtCvatApiKey);
-    setGtIsConfigOpen(false);
-    fetchGtOrgs(gtCvatApiUrl, gtCvatApiKey);
-    fetchGtProjects(gtCvatApiUrl, gtCvatApiKey, gtSelectedOrgId === 'personal' ? '' : gtSelectedOrgId);
+  // Save instances
+  const saveInstances = (instances: CvatInstance[]) => {
+      setSavedInstances(instances);
+      localStorage.setItem('cvatSavedInstances', JSON.stringify(instances));
   };
 
-  const saveStudentConfig = () => {
-    localStorage.setItem('studentCvatApiUrl', studentCvatApiUrl);
-    localStorage.setItem('studentCvatApiKey', studentCvatApiKey);
-    setStudentIsConfigOpen(false);
-    fetchStudentOrgs(studentCvatApiUrl, studentCvatApiKey);
-    fetchStudentProjects(studentCvatApiUrl, studentCvatApiKey, studentSelectedOrgId === 'personal' ? '' : studentSelectedOrgId);
+  const handleAddInstance = () => {
+      if (!newInstanceName.trim() || !newInstanceUrl.trim() || !newInstanceKey.trim()) {
+          toast({ title: "Validation Error", description: "Name, URL, and API Key are required.", variant: "destructive" });
+          return;
+      }
+      const newInstance: CvatInstance = {
+          id: Date.now().toString(),
+          name: newInstanceName.trim(),
+          url: newInstanceUrl.trim(),
+          apiKey: newInstanceKey.trim()
+      };
+      saveInstances([...savedInstances, newInstance]);
+      setNewInstanceName('');
+      setNewInstanceKey('');
+      toast({ title: "Instance Saved", description: "CVAT Instance added successfully." });
   };
+
+  const handleDeleteInstance = (id: string) => {
+      const filtered = savedInstances.filter(inst => inst.id !== id);
+      saveInstances(filtered);
+      if (gtSelectedInstanceId === id) setGtSelectedInstanceId('');
+      if (studentSelectedInstanceId === id) setStudentSelectedInstanceId('');
+  };
+
+  const getGtInstance = () => savedInstances.find(i => i.id === gtSelectedInstanceId);
+  const getStudentInstance = () => savedInstances.find(i => i.id === studentSelectedInstanceId);
+
+  // GT Instance change
+  useEffect(() => {
+      if (gtSelectedInstanceId) {
+          const inst = getGtInstance();
+          if (inst) {
+              fetchGtOrgs(inst.url, inst.apiKey);
+              fetchGtProjects(inst.url, inst.apiKey, gtSelectedOrgId === 'personal' ? '' : gtSelectedOrgId);
+          }
+      } else {
+          setGtOrgs([]);
+          setGtProjects([]);
+          setGtSelectedProjectId('');
+      }
+  }, [gtSelectedInstanceId]);
+
+  // Student Instance change
+  useEffect(() => {
+      if (studentSelectedInstanceId) {
+          const inst = getStudentInstance();
+          if (inst) {
+              fetchStudentOrgs(inst.url, inst.apiKey);
+              fetchStudentProjects(inst.url, inst.apiKey, studentSelectedOrgId === 'personal' ? '' : studentSelectedOrgId);
+          }
+      } else {
+          setStudentOrgs([]);
+          setStudentProjects([]);
+          setStudentSelectedProjectId('');
+      }
+  }, [studentSelectedInstanceId]);
+
 
   const pullData = async (target: 'gt' | 'student') => {
       const projectId = target === 'gt' ? gtSelectedProjectId : studentSelectedProjectId;
-      if (!projectId) return;
+      const inst = target === 'gt' ? getGtInstance() : getStudentInstance();
+
+      if (!projectId || !inst) return;
       
-      const url = target === 'gt' ? gtCvatApiUrl : studentCvatApiUrl;
-      const key = target === 'gt' ? gtCvatApiKey : studentCvatApiKey;
       const setterJobId = target === 'gt' ? setGtDownloadJobId : setStudentDownloadJobId;
       const setterProgress = target === 'gt' ? setGtDownloadProgress : setStudentDownloadProgress;
       
@@ -164,8 +215,8 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                   cvatProjectId: projectId,
-                  cvatApiUrl: url,
-                  cvatApiKey: key,
+                  cvatApiUrl: inst.url,
+                  cvatApiKey: inst.apiKey,
                   type: target
               })
           });
@@ -173,7 +224,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
           const data = await res.json();
           setterJobId(data.jobId);
       } catch (err: any) {
-          toast({ title: "Error starting download", description: err.message });
+          toast({ title: "Error starting download", description: err.message, variant: "destructive" });
       }
   };
 
@@ -244,14 +295,12 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   }, [gtDownloadJobId, studentDownloadJobId]);
 
   const fetchGtOrgs = async (url: string, key: string) => {
-    const trimmedKey = key?.trim();
-    if (!trimmedKey || !url) return;
     setIsFetchingGtOrgs(true);
     try {
         const res = await fetch('/api/cvat/organizations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey })
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key })
         });
         if (res.ok) {
             const data = await res.json();
@@ -265,14 +314,12 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   };
 
   const fetchStudentOrgs = async (url: string, key: string) => {
-    const trimmedKey = key?.trim();
-    if (!trimmedKey || !url) return;
     setIsFetchingStudentOrgs(true);
     try {
         const res = await fetch('/api/cvat/organizations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey })
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key })
         });
         if (res.ok) {
             const data = await res.json();
@@ -286,40 +333,36 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   };
 
   const fetchGtProjects = async (url: string, key: string, org: string) => {
-    const trimmedKey = key?.trim();
-    if (!trimmedKey || !url) return;
     setIsFetchingGtProjects(true);
     try {
         const res = await fetch('/api/cvat/projects', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey, org })
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key, org })
         });
         if (!res.ok) throw new Error("Failed to fetch projects.");
         const data = await res.json();
         setGtProjects(data.results || []);
     } catch (err: any) {
-        toast({ title: "Error", description: err.message });
+        toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
         setIsFetchingGtProjects(false);
     }
   };
 
   const fetchStudentProjects = async (url: string, key: string, org: string) => {
-    const trimmedKey = key?.trim();
-    if (!trimmedKey || !url) return;
     setIsFetchingStudentProjects(true);
     try {
         const res = await fetch('/api/cvat/projects', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: trimmedKey, org })
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key, org })
         });
         if (!res.ok) throw new Error("Failed to fetch projects.");
         const data = await res.json();
         setStudentProjects(data.results || []);
     } catch (err: any) {
-        toast({ title: "Error", description: err.message });
+        toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
         setIsFetchingStudentProjects(false);
     }
@@ -329,49 +372,58 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
       setGtSelectedOrgId(org);
       setGtSelectedProjectId('');
       setGtDownloadedPath(null);
-      fetchGtProjects(gtCvatApiUrl, gtCvatApiKey, org === 'personal' ? '' : org);
+      const inst = getGtInstance();
+      if (inst) {
+          fetchGtProjects(inst.url, inst.apiKey, org === 'personal' ? '' : org);
+      }
   };
 
   const handleStudentOrgChange = (org: string) => {
       setStudentSelectedOrgId(org);
       setStudentSelectedProjectId('');
       setStudentDownloadedPaths([]);
-      fetchStudentProjects(studentCvatApiUrl, studentCvatApiKey, org === 'personal' ? '' : org);
+      const inst = getStudentInstance();
+      if (inst) {
+          fetchStudentProjects(inst.url, inst.apiKey, org === 'personal' ? '' : org);
+      }
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (gtSourceMode === 'file' && (!values.gtFile || values.gtFile.length === 0)) {
-        toast({ title: "Missing Ground Truth", description: "Please upload a Ground Truth file." });
+        toast({ title: "Missing Ground Truth", description: "Please upload a Ground Truth file.", variant: "destructive" });
         return;
     }
     if (gtSourceMode === 'api' && !gtSelectedProjectId) {
-        toast({ title: "Missing Ground Truth", description: "Please select a CVAT project for Ground Truth." });
+        toast({ title: "Missing Ground Truth", description: "Please select a CVAT project for Ground Truth.", variant: "destructive" });
         return;
     }
     if (gtSourceMode === 'api' && !gtDownloadedPath) {
-        toast({ title: "Missing Data", description: "Please pull Ground Truth Data first." });
+        toast({ title: "Missing Data", description: "Please pull Ground Truth Data first.", variant: "destructive" });
         return;
     }
     if (studentSourceMode === 'file' && (!values.studentFiles || values.studentFiles.length === 0)) {
-        toast({ title: "Missing Student Data", description: "Please upload at least one Student file." });
+        toast({ title: "Missing Student Data", description: "Please upload at least one Student file.", variant: "destructive" });
         return;
     }
     if (studentSourceMode === 'api' && !studentSelectedProjectId) {
-        toast({ title: "Missing Student Data", description: "Please select a CVAT project for Student Data." });
+        toast({ title: "Missing Student Data", description: "Please select a CVAT project for Student Data.", variant: "destructive" });
         return;
     }
     if (studentSourceMode === 'api' && studentDownloadedPaths.length === 0) {
-        toast({ title: "Missing Data", description: "Please pull Student Data first." });
+        toast({ title: "Missing Data", description: "Please pull Student Data first.", variant: "destructive" });
         return;
     }
+
+    const gtInst = getGtInstance();
+    const studentInst = getStudentInstance();
 
     onEvaluate({
       gtSourceMode,
       studentSourceMode,
       gtFile: values.gtFile,
       studentFiles: values.studentFiles,
-      cvatApiUrl: gtCvatApiUrl,
-      cvatApiKey: gtCvatApiKey,
+      cvatApiUrl: gtInst?.url || '', // Fallback
+      cvatApiKey: gtInst?.apiKey || '',
       imageFiles: values.imageFiles,
       toolType: values.toolType,
       gtDownloadedPath,
@@ -382,6 +434,66 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   return (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+          {/* Global Saved Instances Manager */}
+          <Collapsible open={isInstancesOpen} onOpenChange={setIsInstancesOpen} className="border-2 border-foreground rounded-md p-3 bg-popover card-style shadow-hard mb-6">
+              <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                      <Settings className="h-4 w-4" /> Global Saved CVAT Instances
+                  </h4>
+                  <CollapsibleTrigger asChild>
+                      <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                          {isInstancesOpen ? 'Hide' : 'Manage'}
+                      </Button>
+                  </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent className="space-y-4">
+                  {savedInstances.length > 0 && (
+                      <div className="space-y-2 mb-4">
+                          <Label className="text-xs font-bold text-muted-foreground">Saved Instances</Label>
+                          {savedInstances.map(inst => (
+                              <div key={inst.id} className="flex items-center justify-between p-2 border-2 border-foreground rounded-sm shadow-inner bg-background">
+                                  <div className="flex flex-col">
+                                      <span className="text-sm font-bold">{inst.name}</span>
+                                      <span className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-xs">{inst.url}</span>
+                                  </div>
+                                  <Button type="button" variant="ghost" size="sm" onClick={() => handleDeleteInstance(inst.id)} className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100">
+                                      <Trash2 className="h-4 w-4" />
+                                  </Button>
+                              </div>
+                          ))}
+                      </div>
+                  )}
+
+                  <div className="p-3 border-2 border-foreground rounded-sm border-dashed bg-muted/20 space-y-3">
+                      <Label className="text-xs font-bold flex items-center gap-1"><Plus className="h-3 w-3"/> Add New Instance</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <Input 
+                            value={newInstanceName} onChange={(e) => setNewInstanceName(e.target.value)} 
+                            placeholder="Name (e.g. GT Server)" className="h-8 text-xs border-2 shadow-hard"
+                        />
+                        <Input 
+                            value={newInstanceUrl} onChange={(e) => setNewInstanceUrl(e.target.value)} 
+                            placeholder="API URL" className="h-8 text-xs border-2 shadow-hard"
+                        />
+                        <div className="relative">
+                            <Input 
+                                type={showNewInstanceKey ? "text" : "password"}
+                                value={newInstanceKey} onChange={(e) => setNewInstanceKey(e.target.value)} 
+                                placeholder="API Key" className="h-8 text-xs border-2 shadow-hard pr-8"
+                            />
+                            <button type="button" onClick={() => setShowNewInstanceKey(!showNewInstanceKey)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                {showNewInstanceKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
+                      </div>
+                      <Button type="button" onClick={handleAddInstance} variant="secondary" size="sm" className="w-full text-xs font-bold border-2 shadow-hard">
+                          Add Instance
+                      </Button>
+                  </div>
+              </CollapsibleContent>
+          </Collapsible>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Ground Truth Section */}
@@ -432,41 +544,28 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                     </TabsContent>
 
                     <TabsContent value="api" className="mt-3">
-                        <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style">
-                            {/* API Config for GT */}
-                            <Collapsible open={gtIsConfigOpen} onOpenChange={setGtIsConfigOpen} className="border-b-2 border-muted pb-3 mb-3">
-                                <div className="flex items-center justify-between mb-2">
-                                    <Label className="text-xs font-bold flex items-center gap-1"><Settings className="h-3 w-3"/> Instance Config</Label>
-                                    <CollapsibleTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]">
-                                            {gtIsConfigOpen ? 'Hide' : 'Edit'}
-                                        </Button>
-                                    </CollapsibleTrigger>
-                                </div>
-                                <CollapsibleContent className="space-y-2 pt-1">
-                                    <Input 
-                                        value={gtCvatApiUrl} onChange={(e) => setGtCvatApiUrl(e.target.value)} 
-                                        placeholder="API URL" className="h-7 text-xs border-2 shadow-hard"
-                                    />
-                                    <div className="relative">
-                                        <Input 
-                                            type={gtShowApiKey ? "text" : "password"}
-                                            value={gtCvatApiKey} onChange={(e) => setGtCvatApiKey(e.target.value)} 
-                                            placeholder="API Key" className="h-7 text-xs border-2 shadow-hard pr-8"
-                                        />
-                                        <button type="button" onClick={() => setGtShowApiKey(!gtShowApiKey)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                            {gtShowApiKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                                        </button>
-                                    </div>
-                                    <Button type="button" onClick={saveGtConfig} variant="secondary" size="sm" className="w-full h-7 text-[10px] font-bold border-2 shadow-hard">
-                                        Save & Connect
-                                    </Button>
-                                </CollapsibleContent>
-                            </Collapsible>
+                        <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style bg-card/50">
+                            
+                            <div className="space-y-1.5 pb-2 border-b-2 border-muted">
+                                <Label className="text-xs font-bold">Select Saved Instance</Label>
+                                <Select value={gtSelectedInstanceId} onValueChange={setGtSelectedInstanceId}>
+                                    <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
+                                        <SelectValue placeholder="Choose a saved instance..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        {savedInstances.map(inst => (
+                                            <SelectItem key={inst.id} value={inst.id} className="text-xs font-bold">{inst.name}</SelectItem>
+                                        ))}
+                                        {savedInstances.length === 0 && (
+                                            <div className="p-2 text-xs text-muted-foreground">No instances saved.</div>
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-bold">Select Organization</Label>
-                                <Select value={gtSelectedOrgId} onValueChange={handleGtOrgChange}>
+                                <Select value={gtSelectedOrgId} onValueChange={handleGtOrgChange} disabled={!gtSelectedInstanceId}>
                                     <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
                                         <SelectValue placeholder="Personal Workspace" />
                                     </SelectTrigger>
@@ -481,12 +580,19 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
                                     <Label className="text-xs font-bold">Select Project</Label>
-                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={() => fetchGtProjects(gtCvatApiUrl, gtCvatApiKey, gtSelectedOrgId === 'personal' ? '' : gtSelectedOrgId)} disabled={isFetchingGtProjects}>
+                                    <Button 
+                                        type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" 
+                                        onClick={() => {
+                                            const inst = getGtInstance();
+                                            if (inst) fetchGtProjects(inst.url, inst.apiKey, gtSelectedOrgId === 'personal' ? '' : gtSelectedOrgId);
+                                        }} 
+                                        disabled={isFetchingGtProjects || !gtSelectedInstanceId}
+                                    >
                                         {isFetchingGtProjects ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                                         Refresh
                                     </Button>
                                 </div>
-                                <Select value={gtSelectedProjectId} onValueChange={setGtSelectedProjectId}>
+                                <Select value={gtSelectedProjectId} onValueChange={setGtSelectedProjectId} disabled={!gtSelectedInstanceId}>
                                     <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
                                         <SelectValue placeholder="Choose a project..." />
                                     </SelectTrigger>
@@ -573,41 +679,28 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                     </TabsContent>
 
                     <TabsContent value="api" className="mt-3">
-                        <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style">
-                            {/* API Config for Student */}
-                            <Collapsible open={studentIsConfigOpen} onOpenChange={setStudentIsConfigOpen} className="border-b-2 border-muted pb-3 mb-3">
-                                <div className="flex items-center justify-between mb-2">
-                                    <Label className="text-xs font-bold flex items-center gap-1"><Settings className="h-3 w-3"/> Instance Config</Label>
-                                    <CollapsibleTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]">
-                                            {studentIsConfigOpen ? 'Hide' : 'Edit'}
-                                        </Button>
-                                    </CollapsibleTrigger>
-                                </div>
-                                <CollapsibleContent className="space-y-2 pt-1">
-                                    <Input 
-                                        value={studentCvatApiUrl} onChange={(e) => setStudentCvatApiUrl(e.target.value)} 
-                                        placeholder="API URL" className="h-7 text-xs border-2 shadow-hard"
-                                    />
-                                    <div className="relative">
-                                        <Input 
-                                            type={studentShowApiKey ? "text" : "password"}
-                                            value={studentCvatApiKey} onChange={(e) => setStudentCvatApiKey(e.target.value)} 
-                                            placeholder="API Key" className="h-7 text-xs border-2 shadow-hard pr-8"
-                                        />
-                                        <button type="button" onClick={() => setStudentShowApiKey(!studentShowApiKey)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                            {studentShowApiKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                                        </button>
-                                    </div>
-                                    <Button type="button" onClick={saveStudentConfig} variant="secondary" size="sm" className="w-full h-7 text-[10px] font-bold border-2 shadow-hard">
-                                        Save & Connect
-                                    </Button>
-                                </CollapsibleContent>
-                            </Collapsible>
+                        <div className="space-y-3 p-3 border-2 border-foreground rounded-md shadow-hard card-style bg-card/50">
+                            
+                            <div className="space-y-1.5 pb-2 border-b-2 border-muted">
+                                <Label className="text-xs font-bold">Select Saved Instance</Label>
+                                <Select value={studentSelectedInstanceId} onValueChange={setStudentSelectedInstanceId}>
+                                    <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
+                                        <SelectValue placeholder="Choose a saved instance..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        {savedInstances.map(inst => (
+                                            <SelectItem key={inst.id} value={inst.id} className="text-xs font-bold">{inst.name}</SelectItem>
+                                        ))}
+                                        {savedInstances.length === 0 && (
+                                            <div className="p-2 text-xs text-muted-foreground">No instances saved.</div>
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-bold">Select Organization</Label>
-                                <Select value={studentSelectedOrgId} onValueChange={handleStudentOrgChange}>
+                                <Select value={studentSelectedOrgId} onValueChange={handleStudentOrgChange} disabled={!studentSelectedInstanceId}>
                                     <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
                                         <SelectValue placeholder="Personal Workspace" />
                                     </SelectTrigger>
@@ -622,12 +715,19 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
                                     <Label className="text-xs font-bold">Select Project</Label>
-                                    <Button type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" onClick={() => fetchStudentProjects(studentCvatApiUrl, studentCvatApiKey, studentSelectedOrgId === 'personal' ? '' : studentSelectedOrgId)} disabled={isFetchingStudentProjects}>
+                                    <Button 
+                                        type="button" variant="ghost" size="sm" className="h-5 px-1 text-[10px]" 
+                                        onClick={() => {
+                                            const inst = getStudentInstance();
+                                            if (inst) fetchStudentProjects(inst.url, inst.apiKey, studentSelectedOrgId === 'personal' ? '' : studentSelectedOrgId);
+                                        }} 
+                                        disabled={isFetchingStudentProjects || !studentSelectedInstanceId}
+                                    >
                                         {isFetchingStudentProjects ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                                         Refresh
                                     </Button>
                                 </div>
-                                <Select value={studentSelectedProjectId} onValueChange={setStudentSelectedProjectId}>
+                                <Select value={studentSelectedProjectId} onValueChange={setStudentSelectedProjectId} disabled={!studentSelectedInstanceId}>
                                     <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
                                         <SelectValue placeholder="Choose a project..." />
                                     </SelectTrigger>
