@@ -55,6 +55,7 @@ export interface CocoImage {
     file_name: string;
     height: number;
     width: number;
+    task_id?: number;
 }
 
 // Point is a [number, number] tuple for [x, y]
@@ -94,6 +95,7 @@ export interface CocoJson {
     images: CocoImage[];
     annotations: BboxAnnotation[] | PolygonAnnotation[];
     categories: CocoCategory[];
+    tasks?: { id: number, name: string }[];
 }
 
 export interface LabelAccuracy {

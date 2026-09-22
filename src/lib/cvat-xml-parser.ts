@@ -14,9 +14,25 @@ export function parseCvatXml(xmlString: string): CocoJson {
     const images: CocoImage[] = [];
     const annotations: BboxAnnotation[] = [];
     const categories: CocoCategory[] = [];
+    const tasks: { id: number, name: string }[] = [];
     let annotationIdCounter = 1;
     const categoryMap = new Map<string, number>();
     let categoryIdCounter = 1;
+
+    // Parse tasks metadata
+    const taskNodes = xmlDoc.getElementsByTagName("task");
+    if (taskNodes && taskNodes.length > 0) {
+        Array.from(taskNodes).forEach((taskNode: Element) => {
+            const idNode = taskNode.getElementsByTagName("id")[0];
+            const nameNode = taskNode.getElementsByTagName("name")[0];
+            if (idNode && nameNode) {
+                tasks.push({
+                    id: parseInt(idNode.textContent || "0", 10),
+                    name: nameNode.textContent || ""
+                });
+            }
+        });
+    }
 
     const getCategoryId = (name: string): number => {
         if (!categoryMap.has(name)) {
@@ -34,12 +50,15 @@ export function parseCvatXml(xmlString: string): CocoJson {
         imageName = imageName.split('/').pop()!;
         const imageWidth = parseInt(imageNode.getAttribute("width") || "0", 10);
         const imageHeight = parseInt(imageNode.getAttribute("height") || "0", 10);
+        const taskIdAttr = imageNode.getAttribute("task_id");
+        const taskId = taskIdAttr ? parseInt(taskIdAttr, 10) : undefined;
 
         images.push({
             id: imageId,
             file_name: imageName,
             width: imageWidth,
-            height: imageHeight
+            height: imageHeight,
+            task_id: taskId
         });
 
         Array.from(imageNode.getElementsByTagName("box")).forEach((boxNode: Element) => {
@@ -79,7 +98,8 @@ export function parseCvatXml(xmlString: string): CocoJson {
     return {
         images,
         annotations,
-        categories
+        categories,
+        tasks
     };
 }
 
@@ -95,9 +115,25 @@ export function parseCvatXmlForPolygons(xmlString: string): CocoJson {
     const images: CocoImage[] = [];
     const annotations: PolygonAnnotation[] = [];
     const categories: CocoCategory[] = [];
+    const tasks: { id: number, name: string }[] = [];
     let annotationIdCounter = 1;
     const categoryMap = new Map<string, number>();
     let categoryIdCounter = 1;
+
+    // Parse tasks metadata
+    const taskNodes = xmlDoc.getElementsByTagName("task");
+    if (taskNodes && taskNodes.length > 0) {
+        Array.from(taskNodes).forEach((taskNode: Element) => {
+            const idNode = taskNode.getElementsByTagName("id")[0];
+            const nameNode = taskNode.getElementsByTagName("name")[0];
+            if (idNode && nameNode) {
+                tasks.push({
+                    id: parseInt(idNode.textContent || "0", 10),
+                    name: nameNode.textContent || ""
+                });
+            }
+        });
+    }
 
     const getCategoryId = (name: string): number => {
         if (!categoryMap.has(name)) {
@@ -114,13 +150,16 @@ export function parseCvatXmlForPolygons(xmlString: string): CocoJson {
         imageName = imageName.split('/').pop()!;
         const imageWidth = parseInt(imageNode.getAttribute("width") || "0", 10);
         const imageHeight = parseInt(imageNode.getAttribute("height") || "0", 10);
+        const taskIdAttr = imageNode.getAttribute("task_id");
+        const taskId = taskIdAttr ? parseInt(taskIdAttr, 10) : undefined;
 
         if (!images.some(img => img.id === imageId)) {
             images.push({
                 id: imageId,
                 file_name: imageName,
                 width: imageWidth,
-                height: imageHeight
+                height: imageHeight,
+                task_id: taskId
             });
         }
 
@@ -169,6 +208,7 @@ export function parseCvatXmlForPolygons(xmlString: string): CocoJson {
     return {
         images,
         annotations,
-        categories
+        categories,
+        tasks
     };
 }

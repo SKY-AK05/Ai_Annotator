@@ -270,7 +270,15 @@ export default function Home() {
         const newImageUrls = new Map<string, string>();
         if (manifest[0].extractedImages) {
             manifest[0].extractedImages.forEach((img: {name: string, url: string}) => {
-                newImageUrls.set(img.name, img.url);
+                // Strip common CVAT zip prefixes so the name matches the annotation file
+                let name = img.name;
+                name = name.replace(/^images\/default\//i, '');
+                name = name.replace(/^images\/train\//i, '');
+                name = name.replace(/^images\/val\//i, '');
+                name = name.replace(/^images\/test\//i, '');
+                name = name.replace(/^images\//i, '');
+                name = name.replace(/^data\//i, '');
+                newImageUrls.set(name, img.url);
             });
         }
         setImageUrls(newImageUrls);
@@ -473,9 +481,15 @@ export default function Home() {
                 const updatedImageUrls = new Map(newImageUrls);
                 batchResults.forEach(result => {
                     if (result.extractedImages) {
-                        result.extractedImages.forEach(img => {
-                            // CVAT images might be nested in folders like data/images/etc, just use basename as key
-                            updatedImageUrls.set(img.name, img.url);
+                        result.extractedImages.forEach((img: {name: string, url: string}) => {
+                            let name = img.name;
+                            name = name.replace(/^images\/default\//i, '');
+                            name = name.replace(/^images\/train\//i, '');
+                            name = name.replace(/^images\/val\//i, '');
+                            name = name.replace(/^images\/test\//i, '');
+                            name = name.replace(/^images\//i, '');
+                            name = name.replace(/^data\//i, '');
+                            updatedImageUrls.set(name, img.url);
                         });
                     }
                 });

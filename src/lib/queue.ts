@@ -138,13 +138,15 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
             content = await zip.files[filename].async('string');
         } else if (!zip.files[filename].dir && filename.match(/\.(jpe?g|png|gif|webp)$/i)) {
             const imageBuffer = await zip.files[filename].async('nodebuffer');
-            const basename = path.basename(filename);
-            const destPath = path.join(jobImagesDir, basename);
+            // Flatten the directory structure for the saved file to avoid creating deep directories,
+            // but keep the full filename in the extractedImages metadata for matching later.
+            const safeDestName = filename.replace(/[\/\\]/g, '_');
+            const destPath = path.join(jobImagesDir, safeDestName);
             await fs.writeFile(destPath, imageBuffer);
             
             extractedImages.push({
-                name: basename,
-                url: `/cvat-images/${job.id}/Project_${cvatProjectId}/${basename}`
+                name: filename, // Original zip path (e.g. 'images/default/Task1/img.jpg')
+                url: `/cvat-images/${job.id}/Project_${cvatProjectId}/${safeDestName}`
             });
         }
     }
@@ -223,17 +225,59 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
         } else {
             studentAnnotations = await parseUniversalBboxDataset(studentFileContent);
         }
-    
-        const initialResult = evaluateAnnotations(gtAnnotations, evalSchema, studentAnnotations);
-        
-        // Pass the extracted images through to the final result if they exist
-        const finalResult = recalculateOverallScore({
-             ...initialResult,
-            studentFilename: studentFile.name,
-            extractedImages: (studentFile as any).extractedImages || []
-        }, scoreOverrides);
 
-        batchResults.push(finalResult);
+        // Group annotations by task if available
+        const studentSplits: { name: string, data: CocoJson }[] = [];
+        if (studentAnnotations.tasks && studentAnnotations.tasks.length > 0) {
+            const taskMap = new Map<number, string>();
+            studentAnnotations.tasks.forEach(t => taskMap.set(t.id, t.name));
+
+            const grouped = new Map<number, { images: any[], annotations: any[] }>();
+            const imageToTask = new Map<number, number>();
+
+            studentAnnotations.images.forEach(img => {
+                const tid = img.task_id;
+                if (tid !== undefined) {
+                    if (!grouped.has(tid)) grouped.set(tid, { images: [], annotations: [] });
+                    grouped.get(tid)!.images.push(img);
+                    imageToTask.set(img.id, tid);
+                }
+            });
+
+            studentAnnotations.annotations.forEach(ann => {
+                const tid = imageToTask.get(ann.image_id);
+                if (tid !== undefined && grouped.has(tid)) {
+                    grouped.get(tid)!.annotations.push(ann);
+                }
+            });
+
+            grouped.forEach((group, tid) => {
+                const taskName = taskMap.get(tid) || `Task_${tid}`;
+                studentSplits.push({
+                    name: taskName,
+                    data: {
+                        images: group.images,
+                        annotations: group.annotations as any,
+                        categories: studentAnnotations.categories
+                    }
+                });
+            });
+        } else {
+            studentSplits.push({ name: studentFile.name, data: studentAnnotations });
+        }
+    
+        for (const split of studentSplits) {
+            const initialResult = evaluateAnnotations(gtAnnotations, evalSchema, split.data);
+            
+            // Pass the extracted images through to the final result if they exist
+            const finalResult = recalculateOverallScore({
+                 ...initialResult,
+                studentFilename: split.name,
+                extractedImages: (studentFile as any).extractedImages || []
+            }, scoreOverrides);
+
+            batchResults.push(finalResult);
+        }
         
         // Update job progress
         await job.updateProgress(Math.round(((i + 1) / totalFiles) * 100));
