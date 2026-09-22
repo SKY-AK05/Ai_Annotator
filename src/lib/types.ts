@@ -38,6 +38,7 @@ export interface FormValues {
   imageFiles?: FileList;
   toolType?: string;
   gtDownloadedPath?: string | null;
+  gtDownloadedUrl?: string | null;
   studentDownloadedPaths?: string[];
 }
 

@@ -163,8 +163,10 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
     const manifestPath = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), 'manifest.json');
     await fs.writeFile(manifestPath, JSON.stringify(downloadedFiles));
 
+    const manifestUrl = `/cvat-images/${job.id}/manifest.json`;
+
     await job.updateProgress(100);
-    return { manifestPath };
+    return { manifestPath, manifestUrl };
 }, { connection, concurrency: 4 });
 if (process.env.NODE_ENV !== 'production') globalForBullMQ.downloadWorker = downloadWorker;
 

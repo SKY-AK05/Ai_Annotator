@@ -239,43 +239,34 @@ export default function Home() {
         let currentGtContent = gtFileContent;
         let currentEvalSchema = evalSchema;
 
-        // If GT is from API and we haven't loaded it yet (or changed it)
-        if (data.gtSourceMode === 'api' && data.gtCvatTaskIds) {
-            const taskId = data.gtCvatTaskIds.split(',')[0]; // Just take the first one for GT
-            if (loadedGtSourceId !== `api-${taskId}`) {
-                toast({ title: "Fetching Ground Truth...", description: "Downloading GT annotations from CVAT." });
-                const exportRes = await fetch('/api/cvat/export', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        cvatApiUrl: data.cvatApiUrl,
-                        cvatApiKey: data.cvatApiKey,
-                        taskId
-                    })
-                });
+        // If GT is from API and we have downloaded it
+        if (data.gtSourceMode === 'api' && data.gtDownloadedUrl) {
+            if (loadedGtSourceId !== data.gtDownloadedUrl) {
+                toast({ title: "Fetching Ground Truth...", description: "Reading downloaded GT annotations." });
+                const manifestRes = await fetch(data.gtDownloadedUrl);
+                if (!manifestRes.ok) throw new Error("Failed to fetch downloaded GT manifest");
+                const manifest = await manifestRes.json();
                 
-                if (!exportRes.ok) {
-                    const errData = await exportRes.json();
-                    throw new Error(`Failed to fetch GT from CVAT: ${errData.error}`);
+                if (manifest && manifest.length > 0) {
+                    currentGtContent = manifest[0].content;
+                    setGtFileContent(currentGtContent);
+                    
+                    // Generate Schema
+                    toast({ title: "Generating Rules...", description: "Extracting evaluation schema from GT." });
+                    const formData = new FormData();
+                    if (currentGtContent) formData.append('gtFileContent', currentGtContent);
+                    const schemaRes = await fetch('/api/schema', { method: 'POST', body: formData });
+                    if (!schemaRes.ok) {
+                        const errData = await schemaRes.json();
+                        throw new Error(errData.error || 'Failed to extract schema');
+                    }
+                    const schemaData = await schemaRes.json();
+                    currentEvalSchema = schemaData.schema;
+                    setEvalSchema(currentEvalSchema);
+                    setLoadedGtSourceId(data.gtDownloadedUrl);
+                } else {
+                    throw new Error("GT Manifest is empty.");
                 }
-                
-                const exportData = await exportRes.json();
-                currentGtContent = exportData.content;
-                setGtFileContent(currentGtContent);
-                
-                // Generate Schema
-                toast({ title: "Generating Rules...", description: "Extracting evaluation schema from GT." });
-                const formData = new FormData();
-                if (currentGtContent) formData.append('gtFileContent', currentGtContent);
-                const schemaRes = await fetch('/api/schema', { method: 'POST', body: formData });
-                if (!schemaRes.ok) {
-                    const errData = await schemaRes.json();
-                    throw new Error(errData.error || 'Failed to extract schema');
-                }
-                const schemaData = await schemaRes.json();
-                currentEvalSchema = schemaData.schema;
-                setEvalSchema(currentEvalSchema);
-                setLoadedGtSourceId(`api-${taskId}`);
             }
         } else if (data.gtSourceMode === 'file' && loadedGtSourceId !== 'file') {
              if (!currentEvalSchema || !currentGtContent) {
@@ -334,15 +325,21 @@ export default function Home() {
         
         // Pass either API details OR files for student tasks
         if (data.studentSourceMode === 'api') {
-            formData.append('cvatTaskIds', data.cvatTaskIds || '');
-            formData.append('cvatApiUrl', data.cvatApiUrl || '');
-            formData.append('cvatApiKey', data.cvatApiKey || '');
+            if (data.studentDownloadedPaths) {
+                for (let i = 0; i < data.studentDownloadedPaths.length; i++) {
+                     formData.append('studentDownloadedPaths', data.studentDownloadedPaths[i]);
+                }
+            }
         } else {
              if (data.studentFiles) {
                 for (let i = 0; i < data.studentFiles.length; i++) {
                      formData.append('studentFiles', data.studentFiles[i]);
                 }
              }
+        }
+        
+        if (data.gtDownloadedPath) {
+            formData.append('gtDownloadedPath', data.gtDownloadedPath);
         }
 
         toast({ title: "Uploading to Server...", description: "Evaluating submissions in the background." });

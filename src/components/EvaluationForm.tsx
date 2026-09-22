@@ -95,6 +95,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   const [gtDownloadJobId, setGtDownloadJobId] = useState<string | null>(null);
   const [gtDownloadProgress, setGtDownloadProgress] = useState(0);
   const [gtDownloadedPath, setGtDownloadedPath] = useState<string | null>(null);
+  const [gtDownloadedUrl, setGtDownloadedUrl] = useState<string | null>(null);
   
   const [studentDownloadJobId, setStudentDownloadJobId] = useState<string | null>(null);
   const [studentDownloadProgress, setStudentDownloadProgress] = useState(0);
@@ -206,6 +207,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
           setStudentDownloadedPaths([]);
       } else {
           setGtDownloadedPath(null);
+          setGtDownloadedUrl(null);
       }
       setterProgress(0);
       
@@ -229,70 +231,67 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
   };
 
   useEffect(() => {
-      const checkStatus = async () => {
-          let jobsActive = false;
-          
-          if (gtDownloadJobId) {
-              jobsActive = true;
-              try {
-                  const res = await fetch(`/api/evaluate/status?jobId=${gtDownloadJobId}&type=download`);
-                  const data = await res.json();
-                  if (data.status === 'completed') {
-                      setGtDownloadedPath(data.batchResults.manifestPath);
-                      setGtDownloadJobId(null);
-                      setGtDownloadProgress(100);
-                      toast({ title: "GT Download Complete!" });
-                  } else if (data.status === 'failed') {
-                      setGtDownloadJobId(null);
-                      toast({ title: "GT Download Failed", description: data.error, variant: "destructive" });
-                  } else {
-                      setGtDownloadProgress(data.progress || 0);
-                  }
-              } catch (e) {
-                  console.error(e);
+      let timeoutId: NodeJS.Timeout;
+      const checkGtStatus = async () => {
+          if (!gtDownloadJobId) return;
+          try {
+              const res = await fetch(`/api/evaluate/status?jobId=${gtDownloadJobId}&type=download`);
+              const data = await res.json();
+              if (data.status === 'completed') {
+                  setGtDownloadedPath(data.batchResults.manifestPath);
+                  setGtDownloadedUrl(data.batchResults.manifestUrl);
+                  setGtDownloadJobId(null);
+                  setGtDownloadProgress(100);
+                  toast({ title: "GT Download Complete!" });
+              } else if (data.status === 'failed') {
+                  setGtDownloadJobId(null);
+                  toast({ title: "GT Download Failed", description: data.error, variant: "destructive" });
+              } else {
+                  setGtDownloadProgress(data.progress || 0);
+                  timeoutId = setTimeout(checkGtStatus, 2000);
               }
-          }
-          
-          if (studentDownloadJobId) {
-              jobsActive = true;
-              try {
-                  const res = await fetch(`/api/evaluate/status?jobId=${studentDownloadJobId}&type=download`);
-                  const data = await res.json();
-                  if (data.status === 'completed') {
-                      setStudentDownloadedPaths([data.batchResults.manifestPath]);
-                      setStudentDownloadJobId(null);
-                      setStudentDownloadProgress(100);
-                      toast({ title: "Student Download Complete!" });
-                  } else if (data.status === 'failed') {
-                      setStudentDownloadJobId(null);
-                      toast({ title: "Student Download Failed", description: data.error, variant: "destructive" });
-                  } else {
-                      setStudentDownloadProgress(data.progress || 0);
-                  }
-              } catch (e) {
-                  console.error(e);
-              }
-          }
-          
-          if (!jobsActive && pollIntervalRef.current) {
-              clearInterval(pollIntervalRef.current);
-              pollIntervalRef.current = null;
+          } catch (e) {
+              console.error(e);
+              timeoutId = setTimeout(checkGtStatus, 2000);
           }
       };
 
-      if (gtDownloadJobId || studentDownloadJobId) {
-          if (!pollIntervalRef.current) {
-              pollIntervalRef.current = setInterval(checkStatus, 2000);
-          }
+      if (gtDownloadJobId) {
+          checkGtStatus();
       }
-      
-      return () => {
-          if (pollIntervalRef.current && !gtDownloadJobId && !studentDownloadJobId) {
-              clearInterval(pollIntervalRef.current);
-              pollIntervalRef.current = null;
+      return () => clearTimeout(timeoutId);
+  }, [gtDownloadJobId]);
+
+  useEffect(() => {
+      let timeoutId: NodeJS.Timeout;
+      const checkStudentStatus = async () => {
+          if (!studentDownloadJobId) return;
+          try {
+              const res = await fetch(`/api/evaluate/status?jobId=${studentDownloadJobId}&type=download`);
+              const data = await res.json();
+              if (data.status === 'completed') {
+                  setStudentDownloadedPaths([data.batchResults.manifestPath]);
+                  setStudentDownloadJobId(null);
+                  setStudentDownloadProgress(100);
+                  toast({ title: "Student Download Complete!" });
+              } else if (data.status === 'failed') {
+                  setStudentDownloadJobId(null);
+                  toast({ title: "Student Download Failed", description: data.error, variant: "destructive" });
+              } else {
+                  setStudentDownloadProgress(data.progress || 0);
+                  timeoutId = setTimeout(checkStudentStatus, 2000);
+              }
+          } catch (e) {
+              console.error(e);
+              timeoutId = setTimeout(checkStudentStatus, 2000);
           }
       };
-  }, [gtDownloadJobId, studentDownloadJobId]);
+
+      if (studentDownloadJobId) {
+          checkStudentStatus();
+      }
+      return () => clearTimeout(timeoutId);
+  }, [studentDownloadJobId]);
 
   const fetchGtOrgs = async (url: string, key: string) => {
     setIsFetchingGtOrgs(true);
@@ -427,6 +426,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
       imageFiles: values.imageFiles,
       toolType: values.toolType,
       gtDownloadedPath,
+      gtDownloadedUrl,
       studentDownloadedPaths
     });
   }
