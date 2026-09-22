@@ -223,6 +223,79 @@ export default function Home() {
       console.log("Feedback cache populated:", newCache);
   };
 
+  const handleGenerateRulesFromApi = async (manifestPath: string) => {
+    setIsGeneratingRules(true);
+    setResults(null);
+    setEvalSchema(null);
+    setGtFileContent(null);
+    setImageUrls(new Map());
+    setSelectedAnnotation(null);
+    setFeedback(null);
+    setFeedbackCache(new Map());
+    setEvaluationError(null);
+
+    try {
+        toast({ title: "Loading GT Data...", description: "Reading downloaded project data." });
+        
+        const manifestRes = await fetch('/api/pull-data/read-manifest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ manifestPath })
+        });
+        
+        if (!manifestRes.ok) {
+            const errData = await manifestRes.json();
+            throw new Error(`Failed to read manifest: ${errData.error}`);
+        }
+        
+        const manifestData = await manifestRes.json();
+        const manifest = manifestData.manifest;
+        
+        if (!manifest || manifest.length === 0) {
+            throw new Error("GT Manifest is empty.");
+        }
+        
+        const content = manifest[0].content;
+        setGtFileContent(content);
+        
+        // Extract images from GT manifest if present
+        const newImageUrls = new Map<string, string>();
+        if (manifest[0].extractedImages) {
+            manifest[0].extractedImages.forEach((img: {name: string, url: string}) => {
+                newImageUrls.set(img.name, img.url);
+            });
+        }
+        setImageUrls(newImageUrls);
+
+        toast({ title: "Generating Rules...", description: "Extracting evaluation schema from GT." });
+        const formData = new FormData();
+        formData.append('gtFileContent', content);
+        const schemaRes = await fetch('/api/schema', { method: 'POST', body: formData });
+        
+        if (!schemaRes.ok) {
+            const errData = await schemaRes.json();
+            throw new Error(errData.error || 'Failed to extract schema');
+        }
+        
+        const schemaData = await schemaRes.json();
+        setEvalSchema(schemaData.schema);
+        setLoadedGtSourceId(manifestPath);
+        
+        toast({
+            title: "Evaluation Rules Ready",
+            description: "The rules have been generated successfully.",
+        });
+    } catch (e: any) {
+        console.error(e);
+        toast({
+            title: "Error Generating Rules",
+            description: e.message || "Failed to load GT and generate rules.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsGeneratingRules(false);
+    }
+  };
 
   const [loadedGtSourceId, setLoadedGtSourceId] = useState<string | null>(null);
 
@@ -240,12 +313,18 @@ export default function Home() {
         let currentEvalSchema = evalSchema;
 
         // If GT is from API and we have downloaded it
-        if (data.gtSourceMode === 'api' && data.gtDownloadedUrl) {
-            if (loadedGtSourceId !== data.gtDownloadedUrl) {
+        if (data.gtSourceMode === 'api' && data.gtDownloadedPath) {
+            if (loadedGtSourceId !== data.gtDownloadedPath) {
+                // If they haven't clicked Generate Rules, we need to do it here as a fallback
                 toast({ title: "Fetching Ground Truth...", description: "Reading downloaded GT annotations." });
-                const manifestRes = await fetch(data.gtDownloadedUrl);
+                const manifestRes = await fetch('/api/pull-data/read-manifest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ manifestPath: data.gtDownloadedPath })
+                });
                 if (!manifestRes.ok) throw new Error("Failed to fetch downloaded GT manifest");
-                const manifest = await manifestRes.json();
+                const manifestData = await manifestRes.json();
+                const manifest = manifestData.manifest;
                 
                 if (manifest && manifest.length > 0) {
                     currentGtContent = manifest[0].content;
@@ -263,7 +342,7 @@ export default function Home() {
                     const schemaData = await schemaRes.json();
                     currentEvalSchema = schemaData.schema;
                     setEvalSchema(currentEvalSchema);
-                    setLoadedGtSourceId(data.gtDownloadedUrl);
+                    setLoadedGtSourceId(data.gtDownloadedPath);
                 } else {
                     throw new Error("GT Manifest is empty.");
                 }
@@ -560,6 +639,7 @@ export default function Home() {
                   imageUrls={imageUrls}
                   onEvaluate={handleEvaluate}
                   onGtFileChange={handleGtFileChange}
+                  onGenerateRules={handleGenerateRulesFromApi}
                   evalSchema={evalSchema}
                   onRuleChange={handleRuleChange}
                   selectedAnnotation={selectedAnnotation}
