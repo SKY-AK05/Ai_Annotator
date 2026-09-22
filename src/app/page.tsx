@@ -270,14 +270,7 @@ export default function Home() {
         const newImageUrls = new Map<string, string>();
         if (manifest[0].extractedImages) {
             manifest[0].extractedImages.forEach((img: {name: string, url: string}) => {
-                // Strip common CVAT zip prefixes so the name matches the annotation file
-                let name = img.name;
-                name = name.replace(/^images\/default\//i, '');
-                name = name.replace(/^images\/train\//i, '');
-                name = name.replace(/^images\/val\//i, '');
-                name = name.replace(/^images\/test\//i, '');
-                name = name.replace(/^images\//i, '');
-                name = name.replace(/^data\//i, '');
+                let name = img.name.split('/').pop()!;
                 newImageUrls.set(name, img.url);
             });
         }
@@ -482,13 +475,7 @@ export default function Home() {
                 batchResults.forEach(result => {
                     if (result.extractedImages) {
                         result.extractedImages.forEach((img: {name: string, url: string}) => {
-                            let name = img.name;
-                            name = name.replace(/^images\/default\//i, '');
-                            name = name.replace(/^images\/train\//i, '');
-                            name = name.replace(/^images\/val\//i, '');
-                            name = name.replace(/^images\/test\//i, '');
-                            name = name.replace(/^images\//i, '');
-                            name = name.replace(/^data\//i, '');
+                            let name = img.name.split('/').pop()!;
                             updatedImageUrls.set(name, img.url);
                         });
                     }
