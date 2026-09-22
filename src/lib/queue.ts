@@ -39,7 +39,8 @@ export interface EvaluationJobData {
 }
 
 export interface DownloadJobData {
-    cvatTaskIds: string;
+    cvatProjectId?: string;
+    cvatTaskIds?: string;
     cvatApiUrl: string;
     cvatApiKey: string;
     type: 'gt' | 'student';
@@ -47,22 +48,17 @@ export interface DownloadJobData {
 
 export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('DownloadQueue', async (job) => {
     const data = job.data as DownloadJobData;
-    const { cvatTaskIds, cvatApiUrl, cvatApiKey } = data;
+    const { cvatProjectId, cvatTaskIds, cvatApiUrl, cvatApiKey } = data;
     
-    const taskIds = cvatTaskIds.split(',').map(id => id.trim()).filter(Boolean);
-    const totalFilesApi = taskIds.length;
     const JSZip = (await import('jszip')).default;
-    
     const downloadedFiles: { name: string, content: string, extractedImages: {name: string, url: string}[] }[] = [];
     
-    for (const taskId of taskIds) {
-        await job.updateProgress(Math.round(((taskIds.indexOf(taskId)) / totalFilesApi) * 80));
-        
+    if (cvatProjectId) {
         let fileBuffer: ArrayBuffer | null = null;
         let attempts = 0;
         
         while (attempts < 30) {
-            const res = await fetch(`${cvatApiUrl}/api/tasks/${taskId}/dataset?format=COCO%201.0&action=download`, {
+            const res = await fetch(`${cvatApiUrl}/api/projects/${cvatProjectId}/dataset?format=COCO%201.0&action=download`, {
                 headers: { 'Authorization': `Bearer ${cvatApiKey}` }
             });
             
@@ -73,19 +69,19 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
                 await new Promise(r => setTimeout(r, 2000));
                 attempts++;
             } else {
-                throw new Error(`CVAT API Error for Task ${taskId}: ${res.statusText}`);
+                throw new Error(`CVAT API Error for Project ${cvatProjectId}: ${res.statusText}`);
             }
         }
         
         if (!fileBuffer) {
-            throw new Error(`Timed out waiting for CVAT Task ${taskId} annotations export.`);
+            throw new Error(`Timed out waiting for CVAT Project ${cvatProjectId} annotations export.`);
         }
 
         const zip = await JSZip.loadAsync(fileBuffer);
         let content: string | null = null;
         const extractedImages: {name: string, url: string}[] = [];
         
-        const jobImagesDir = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), String(taskId));
+        const jobImagesDir = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), `Project_${cvatProjectId}`);
         await fs.mkdir(jobImagesDir, { recursive: true });
         
         for (const filename in zip.files) {
@@ -99,20 +95,83 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
                 
                 extractedImages.push({
                     name: basename,
-                    url: `/cvat-images/${job.id}/${taskId}/${basename}`
+                    url: `/cvat-images/${job.id}/Project_${cvatProjectId}/${basename}`
                 });
             }
         }
         
         if (!content) {
-            throw new Error(`Could not find an annotation file in the export for Task ${taskId}.`);
+            throw new Error(`Could not find an annotation file in the export for Project ${cvatProjectId}.`);
         }
         
         downloadedFiles.push({ 
-            name: `Task_${taskId}`, 
+            name: `Project_${cvatProjectId}`, 
             content,
             extractedImages
         });
+    } else if (cvatTaskIds) {
+        const taskIds = cvatTaskIds.split(',').map(id => id.trim()).filter(Boolean);
+        const totalFilesApi = taskIds.length;
+        
+        for (const taskId of taskIds) {
+            await job.updateProgress(Math.round(((taskIds.indexOf(taskId)) / totalFilesApi) * 80));
+            
+            let fileBuffer: ArrayBuffer | null = null;
+            let attempts = 0;
+            
+            while (attempts < 30) {
+                const res = await fetch(`${cvatApiUrl}/api/tasks/${taskId}/dataset?format=COCO%201.0&action=download`, {
+                    headers: { 'Authorization': `Bearer ${cvatApiKey}` }
+                });
+                
+                if (res.status === 200 || res.status === 201) {
+                    fileBuffer = await res.arrayBuffer();
+                    break;
+                } else if (res.status === 202) {
+                    await new Promise(r => setTimeout(r, 2000));
+                    attempts++;
+                } else {
+                    throw new Error(`CVAT API Error for Task ${taskId}: ${res.statusText}`);
+                }
+            }
+            
+            if (!fileBuffer) {
+                throw new Error(`Timed out waiting for CVAT Task ${taskId} annotations export.`);
+            }
+
+            const zip = await JSZip.loadAsync(fileBuffer);
+            let content: string | null = null;
+            const extractedImages: {name: string, url: string}[] = [];
+            
+            const jobImagesDir = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), String(taskId));
+            await fs.mkdir(jobImagesDir, { recursive: true });
+            
+            for (const filename in zip.files) {
+                if (filename.endsWith('.json') || filename.endsWith('.xml')) {
+                    content = await zip.files[filename].async('string');
+                } else if (!zip.files[filename].dir && filename.match(/\.(jpe?g|png|gif|webp)$/i)) {
+                    const imageBuffer = await zip.files[filename].async('nodebuffer');
+                    const basename = path.basename(filename);
+                    const destPath = path.join(jobImagesDir, basename);
+                    await fs.writeFile(destPath, imageBuffer);
+                    
+                    extractedImages.push({
+                        name: basename,
+                        url: `/cvat-images/${job.id}/${taskId}/${basename}`
+                    });
+                }
+            }
+            
+            if (!content) {
+                throw new Error(`Could not find an annotation file in the export for Task ${taskId}.`);
+            }
+            
+            downloadedFiles.push({ 
+                name: `Task_${taskId}`, 
+                content,
+                extractedImages
+            });
+        }
     }
 
     // Save metadata to disk instead of returning all strings in memory

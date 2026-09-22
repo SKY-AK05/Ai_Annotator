@@ -142,7 +142,13 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
 
   const pullData = async (target: 'gt' | 'student') => {
       const taskIds = target === 'gt' ? gtSelectedTaskIds : studentSelectedTaskIds;
-      if (taskIds.size === 0) return;
+      const projectId = target === 'gt' ? gtSelectedProjectId : studentSelectedProjectId;
+      const allTasks = target === 'gt' ? gtTasks : studentTasks;
+      
+      const isAllSelected = taskIds.size === allTasks.length && taskIds.size > 0;
+      const shouldPullProject = taskIds.size === 0 || isAllSelected;
+
+      if (!projectId && taskIds.size === 0) return;
       
       const setterJobId = target === 'gt' ? setGtDownloadJobId : setStudentDownloadJobId;
       const setterProgress = target === 'gt' ? setGtDownloadProgress : setStudentDownloadProgress;
@@ -161,7 +167,8 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                  cvatTaskIds: Array.from(taskIds).join(','),
+                  cvatProjectId: shouldPullProject ? projectId : undefined,
+                  cvatTaskIds: !shouldPullProject ? Array.from(taskIds).join(',') : undefined,
                   cvatApiUrl,
                   cvatApiKey,
                   type: target
@@ -636,7 +643,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                             </div>
                                         </div>
                                     )}
-                                    {gtTasks.length > 0 && gtSelectedTaskIds.size > 0 && (
+                                    {gtSelectedProjectId && (
                                         <div className="pt-2">
                                             <Button 
                                                 type="button" 
@@ -649,7 +656,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                                 ) : gtDownloadedPath ? (
                                                     <><CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Ready</>
                                                 ) : (
-                                                    <><DownloadCloud className="mr-2 h-4 w-4" /> Pull Ground Truth Data</>
+                                                    <><DownloadCloud className="mr-2 h-4 w-4" /> {(gtSelectedTaskIds.size === 0 || gtSelectedTaskIds.size === gtTasks.length) ? 'Pull Entire Project' : `Pull ${gtSelectedTaskIds.size} Tasks`}</>
                                                 )}
                                             </Button>
                                             {gtDownloadJobId && (
@@ -799,7 +806,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                             </div>
                                         </div>
                                     )}
-                                    {studentTasks.length > 0 && studentSelectedTaskIds.size > 0 && (
+                                    {studentSelectedProjectId && (
                                         <div className="pt-2">
                                             <Button 
                                                 type="button" 
@@ -812,7 +819,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, imageUrl
                                                 ) : studentDownloadedPaths.length > 0 ? (
                                                     <><CheckCircle className="mr-2 h-4 w-4 text-green-500" /> Ready</>
                                                 ) : (
-                                                    <><DownloadCloud className="mr-2 h-4 w-4" /> Pull Student Data</>
+                                                    <><DownloadCloud className="mr-2 h-4 w-4" /> {(studentSelectedTaskIds.size === 0 || studentSelectedTaskIds.size === studentTasks.length) ? 'Pull Entire Project' : `Pull ${studentSelectedTaskIds.size} Tasks`}</>
                                                 )}
                                             </Button>
                                             {studentDownloadJobId && (
