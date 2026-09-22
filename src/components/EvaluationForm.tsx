@@ -46,6 +46,7 @@ interface EvaluationFormProps {
   isLoading: boolean;
   onGtFileChange: (file: File | undefined) => void;
   onGenerateRules?: (manifestPath: string) => void;
+  isGeneratingRules?: boolean;
   imageUrls: Map<string, string>;
 }
 
@@ -56,7 +57,7 @@ interface CvatInstance {
     apiKey: string;
 }
 
-export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenerateRules, imageUrls }: EvaluationFormProps) {
+export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenerateRules, isGeneratingRules, imageUrls }: EvaluationFormProps) {
   const { toast } = useToast();
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -636,10 +637,15 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
                                     {gtDownloadedPath && !gtDownloadJobId && (
                                         <Button 
                                             type="button" 
-                                            onClick={() => onGenerateRules && onGenerateRules(gtDownloadedPath)} 
+                                            onClick={() => onGenerateRules && onGenerateRules(gtDownloadedPath)}
+                                            disabled={isGeneratingRules}
                                             className="w-full text-xs h-8 border-2 shadow-hard font-bold bg-primary text-primary-foreground mt-2 hover:bg-primary/90"
                                         >
-                                            <FileCog className="mr-2 h-4 w-4" /> Load GT & Generate Rules
+                                            {isGeneratingRules ? (
+                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating Rules...</>
+                                            ) : (
+                                                <><FileCog className="mr-2 h-4 w-4" /> Load GT & Generate Rules</>
+                                            )}
                                         </Button>
                                     )}
 

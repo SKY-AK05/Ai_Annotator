@@ -12,8 +12,8 @@ export async function POST(request: Request) {
         }
 
         // Basic safety check: ensure the path is within public/cvat-images
-        const normalizedPath = path.normalize(manifestPath);
-        const expectedDir = path.normalize(path.join(process.cwd(), 'public', 'cvat-images'));
+        const normalizedPath = path.normalize(manifestPath).toLowerCase();
+        const expectedDir = path.normalize(path.join(process.cwd(), 'public', 'cvat-images')).toLowerCase();
         
         if (!normalizedPath.startsWith(expectedDir)) {
             return NextResponse.json({ error: 'Invalid manifest path' }, { status: 403 });

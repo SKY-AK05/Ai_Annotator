@@ -640,6 +640,7 @@ export default function Home() {
                   onEvaluate={handleEvaluate}
                   onGtFileChange={handleGtFileChange}
                   onGenerateRules={handleGenerateRulesFromApi}
+                  isGeneratingRules={isGeneratingRules}
                   evalSchema={evalSchema}
                   onRuleChange={handleRuleChange}
                   selectedAnnotation={selectedAnnotation}
