@@ -4,7 +4,7 @@ import * as React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, Eye, EyeOff, DownloadCloud, Plus, Trash2 } from 'lucide-react';
+import { Loader2, UploadCloud, FileCog, Image as ImageIcon, CheckCircle, Settings, Eye, EyeOff, DownloadCloud, Plus, Trash2, Pencil, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Progress } from "@/components/ui/progress";
 
@@ -72,6 +72,7 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
   const [newInstanceKey, setNewInstanceKey] = useState('');
   const [showNewInstanceKey, setShowNewInstanceKey] = useState(false);
   const [isInstancesOpen, setIsInstancesOpen] = useState(true);
+  const [editingInstanceId, setEditingInstanceId] = useState<string | null>(null);
 
   // GT API State
   const [gtSelectedInstanceId, setGtSelectedInstanceId] = useState<string>('');
@@ -146,21 +147,49 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
       localStorage.setItem('cvatSavedInstances', JSON.stringify(instances));
   };
 
-  const handleAddInstance = () => {
+  const handleSaveInstance = () => {
       if (!newInstanceName.trim() || !newInstanceUrl.trim() || !newInstanceKey.trim()) {
           toast({ title: "Validation Error", description: "Name, URL, and API Key are required.", variant: "destructive" });
           return;
       }
-      const newInstance: CvatInstance = {
-          id: Date.now().toString(),
-          name: newInstanceName.trim(),
-          url: newInstanceUrl.trim(),
-          apiKey: newInstanceKey.trim()
-      };
-      saveInstances([...savedInstances, newInstance]);
+      
+      if (editingInstanceId) {
+          const updatedInstances = savedInstances.map(inst => 
+              inst.id === editingInstanceId 
+                  ? { ...inst, name: newInstanceName.trim(), url: newInstanceUrl.trim(), apiKey: newInstanceKey.trim() } 
+                  : inst
+          );
+          saveInstances(updatedInstances);
+          setEditingInstanceId(null);
+          toast({ title: "Instance Updated", description: "CVAT Instance updated successfully." });
+      } else {
+          const newInstance: CvatInstance = {
+              id: Date.now().toString(),
+              name: newInstanceName.trim(),
+              url: newInstanceUrl.trim(),
+              apiKey: newInstanceKey.trim()
+          };
+          saveInstances([...savedInstances, newInstance]);
+          toast({ title: "Instance Saved", description: "CVAT Instance added successfully." });
+      }
+      
       setNewInstanceName('');
+      setNewInstanceUrl('https://opencvat-ig.orchvate.com');
       setNewInstanceKey('');
-      toast({ title: "Instance Saved", description: "CVAT Instance added successfully." });
+  };
+
+  const handleEditInstance = (inst: CvatInstance) => {
+      setEditingInstanceId(inst.id);
+      setNewInstanceName(inst.name);
+      setNewInstanceUrl(inst.url);
+      setNewInstanceKey(inst.apiKey);
+  };
+
+  const cancelEdit = () => {
+      setEditingInstanceId(null);
+      setNewInstanceName('');
+      setNewInstanceUrl('https://opencvat-ig.orchvate.com');
+      setNewInstanceKey('');
   };
 
   const handleDeleteInstance = (id: string) => {
@@ -532,16 +561,31 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
                                       <span className="text-sm font-bold">{inst.name}</span>
                                       <span className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-xs">{inst.url}</span>
                                   </div>
-                                  <Button type="button" variant="ghost" size="sm" onClick={() => handleDeleteInstance(inst.id)} className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100">
-                                      <Trash2 className="h-4 w-4" />
-                                  </Button>
+                                  <div className="flex gap-2">
+                                      <Button type="button" variant="ghost" size="sm" onClick={() => handleEditInstance(inst)} className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700 hover:bg-blue-100">
+                                          <Pencil className="h-4 w-4" />
+                                      </Button>
+                                      <Button type="button" variant="ghost" size="sm" onClick={() => handleDeleteInstance(inst.id)} className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100">
+                                          <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                  </div>
                               </div>
                           ))}
                       </div>
                   )}
 
                   <div className="p-3 border-2 border-foreground rounded-sm border-dashed bg-muted/20 space-y-3">
-                      <Label className="text-xs font-bold flex items-center gap-1"><Plus className="h-3 w-3"/> Add New Instance</Label>
+                      <div className="flex items-center justify-between">
+                          <Label className="text-xs font-bold flex items-center gap-1">
+                              {editingInstanceId ? <Pencil className="h-3 w-3"/> : <Plus className="h-3 w-3"/>} 
+                              {editingInstanceId ? "Edit Instance" : "Add New Instance"}
+                          </Label>
+                          {editingInstanceId && (
+                              <Button type="button" variant="ghost" size="sm" onClick={cancelEdit} className="h-5 px-1 text-[10px] text-muted-foreground hover:text-foreground">
+                                  <X className="h-3 w-3 mr-1" /> Cancel Edit
+                              </Button>
+                          )}
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <Input 
                             value={newInstanceName} onChange={(e) => setNewInstanceName(e.target.value)} 
@@ -562,8 +606,8 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
                             </button>
                         </div>
                       </div>
-                      <Button type="button" onClick={handleAddInstance} variant="secondary" size="sm" className="w-full text-xs font-bold border-2 shadow-hard">
-                          Add Instance
+                      <Button type="button" onClick={handleSaveInstance} variant="secondary" size="sm" className="w-full text-xs font-bold border-2 shadow-hard">
+                          {editingInstanceId ? "Save Changes" : "Add Instance"}
                       </Button>
                   </div>
               </CollapsibleContent>
