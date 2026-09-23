@@ -470,7 +470,7 @@ const SingleResultDisplay = ({ result, imageUrls, selectedAnnotation, onAnnotati
                             {imageResult.imageName}
                         </AccordionTrigger>
                         <AccordionContent className="p-2">
-                           <ImageResultDisplay studentFilename={result.studentFilename} imageResult={imageResult} imageUrl={imageUrls.get(imageResult.imageName)} selectedAnnotation={selectedAnnotation} onAnnotationSelect={onAnnotationSelect} feedback={feedback} onScoreOverride={onScoreOverride} />
+                           <ImageResultDisplay studentFilename={result.studentFilename} imageResult={imageResult} imageUrl={imageUrls.get(imageResult.imageName.split('/').pop()!)} selectedAnnotation={selectedAnnotation} onAnnotationSelect={onAnnotationSelect} feedback={feedback} onScoreOverride={onScoreOverride} />
                         </AccordionContent>
                     </AccordionItem>
                 ))}

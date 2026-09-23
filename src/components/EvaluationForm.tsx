@@ -82,6 +82,10 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
   const [gtSelectedOrgId, setGtSelectedOrgId] = useState<string>('personal');
   const [gtSelectedProjectId, setGtSelectedProjectId] = useState<string>('');
   const [gtProjectSearch, setGtProjectSearch] = useState('');
+  const [gtTasks, setGtTasks] = useState<any[]>([]);
+  const [isFetchingGtTasks, setIsFetchingGtTasks] = useState(false);
+  const [gtSelectedTaskIds, setGtSelectedTaskIds] = useState<string[]>([]);
+  const [gtTaskSearch, setGtTaskSearch] = useState('');
 
   // Student API State
   const [studentSelectedInstanceId, setStudentSelectedInstanceId] = useState<string>('');
@@ -92,6 +96,10 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
   const [studentSelectedOrgId, setStudentSelectedOrgId] = useState<string>('personal');
   const [studentSelectedProjectId, setStudentSelectedProjectId] = useState<string>('');
   const [studentProjectSearch, setStudentProjectSearch] = useState('');
+  const [studentTasks, setStudentTasks] = useState<any[]>([]);
+  const [isFetchingStudentTasks, setIsFetchingStudentTasks] = useState(false);
+  const [studentSelectedTaskIds, setStudentSelectedTaskIds] = useState<string[]>([]);
+  const [studentTaskSearch, setStudentTaskSearch] = useState('');
 
   // Download State
   const [gtDownloadJobId, setGtDownloadJobId] = useState<string | null>(null);
@@ -221,7 +229,8 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
                   cvatProjectId: projectId,
                   cvatApiUrl: inst.url,
                   cvatApiKey: inst.apiKey,
-                  type: target
+                  type: target,
+                  taskIds: target === 'gt' ? (gtSelectedTaskIds.length > 0 ? gtSelectedTaskIds : undefined) : (studentSelectedTaskIds.length > 0 ? studentSelectedTaskIds : undefined)
               })
           });
           if (!res.ok) throw new Error("Failed to start pull job");
@@ -368,6 +377,70 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
         setIsFetchingStudentProjects(false);
     }
   };
+
+  const fetchGtTasks = async (url: string, key: string, projectId: string, org: string) => {
+    setIsFetchingGtTasks(true);
+    try {
+        const res = await fetch('/api/cvat/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key, projectId, org })
+        });
+        if (!res.ok) throw new Error("Failed to fetch GT tasks.");
+        const data = await res.json();
+        setGtTasks(data.results || []);
+    } catch (err: any) {
+        toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+        setIsFetchingGtTasks(false);
+    }
+  };
+
+  const fetchStudentTasks = async (url: string, key: string, projectId: string, org: string) => {
+    setIsFetchingStudentTasks(true);
+    try {
+        const res = await fetch('/api/cvat/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cvatApiUrl: url, cvatApiKey: key, projectId, org })
+        });
+        if (!res.ok) throw new Error("Failed to fetch Student tasks.");
+        const data = await res.json();
+        setStudentTasks(data.results || []);
+    } catch (err: any) {
+        toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+        setIsFetchingStudentTasks(false);
+    }
+  };
+
+  // GT Project change
+  useEffect(() => {
+      setGtSelectedTaskIds([]);
+      setGtDownloadedPath(null);
+      if (gtSelectedProjectId) {
+          const inst = getGtInstance();
+          if (inst) {
+              fetchGtTasks(inst.url, inst.apiKey, gtSelectedProjectId, gtSelectedOrgId === 'personal' ? '' : gtSelectedOrgId);
+          }
+      } else {
+          setGtTasks([]);
+      }
+  }, [gtSelectedProjectId]);
+
+  // Student Project change
+  useEffect(() => {
+      setStudentSelectedTaskIds([]);
+      setStudentDownloadedPaths([]);
+      if (studentSelectedProjectId) {
+          const inst = getStudentInstance();
+          if (inst) {
+              fetchStudentTasks(inst.url, inst.apiKey, studentSelectedProjectId, studentSelectedOrgId === 'personal' ? '' : studentSelectedOrgId);
+          }
+      } else {
+          setStudentTasks([]);
+      }
+  }, [studentSelectedProjectId]);
 
   const handleGtOrgChange = (org: string) => {
       setGtSelectedOrgId(org);
@@ -618,6 +691,46 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
                                 </Select>
                             </div>
 
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-bold">Select Tasks (Optional, pulls whole project if empty)</Label>
+                                <Select disabled={!gtSelectedProjectId}>
+                                    <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
+                                        <SelectValue placeholder={gtSelectedTaskIds.length > 0 ? `${gtSelectedTaskIds.length} tasks selected` : "Select specific tasks..."} />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        <div className="p-2 border-b">
+                                            <Input 
+                                                placeholder="Search tasks..." 
+                                                className="h-7 text-xs"
+                                                value={gtTaskSearch}
+                                                onChange={(e) => setGtTaskSearch(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                        <div className="max-h-60 overflow-y-auto p-1">
+                                            {gtTasks.filter(t => t.name.toLowerCase().includes(gtTaskSearch.toLowerCase())).map(t => (
+                                                <div key={t.id} className="flex items-center gap-2 p-1.5 hover:bg-accent rounded-sm cursor-pointer" onClick={() => {
+                                                    setGtSelectedTaskIds(prev => prev.includes(t.id.toString()) ? prev.filter(id => id !== t.id.toString()) : [...prev, t.id.toString()])
+                                                    setGtDownloadedPath(null);
+                                                }}>
+                                                    <div className={`w-4 h-4 border rounded-sm flex items-center justify-center ${gtSelectedTaskIds.includes(t.id.toString()) ? 'bg-primary border-primary' : 'border-input'}`}>
+                                                        {gtSelectedTaskIds.includes(t.id.toString()) && <CheckCircle className="w-3 h-3 text-primary-foreground" />}
+                                                    </div>
+                                                    <span className="text-xs truncate">{t.name} (ID: {t.id})</span>
+                                                </div>
+                                            ))}
+                                            {gtTasks.filter(t => t.name.toLowerCase().includes(gtTaskSearch.toLowerCase())).length === 0 && (
+                                                <div className="p-2 text-xs text-muted-foreground text-center">No tasks found.</div>
+                                            )}
+                                        </div>
+                                        <div className="p-2 border-t flex justify-end gap-2">
+                                             <Button variant="ghost" size="sm" className="h-6 text-[10px]" onClick={(e) => { e.stopPropagation(); setGtSelectedTaskIds([]); setGtDownloadedPath(null); }}>Clear</Button>
+                                             <Button variant="outline" size="sm" className="h-6 text-[10px]" onClick={(e) => { e.stopPropagation(); setGtSelectedTaskIds(gtTasks.map(t => t.id.toString())); setGtDownloadedPath(null); }}>Select All</Button>
+                                        </div>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
                             {gtSelectedProjectId && (
                                 <div className="pt-2">
                                     <Button 
@@ -765,6 +878,46 @@ export function EvaluationForm({ onEvaluate, isLoading, onGtFileChange, onGenera
                                         {studentProjects.filter(p => p.name.toLowerCase().includes(studentProjectSearch.toLowerCase())).length === 0 && (
                                             <div className="p-2 text-xs text-muted-foreground text-center">No projects found.</div>
                                         )}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-bold">Select Tasks (Optional, pulls whole project if empty)</Label>
+                                <Select disabled={!studentSelectedProjectId}>
+                                    <SelectTrigger className="h-8 text-xs border-2 shadow-hard bg-background">
+                                        <SelectValue placeholder={studentSelectedTaskIds.length > 0 ? `${studentSelectedTaskIds.length} tasks selected` : "Select specific tasks..."} />
+                                    </SelectTrigger>
+                                    <SelectContent className="card-style">
+                                        <div className="p-2 border-b">
+                                            <Input 
+                                                placeholder="Search tasks..." 
+                                                className="h-7 text-xs"
+                                                value={studentTaskSearch}
+                                                onChange={(e) => setStudentTaskSearch(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                        <div className="max-h-60 overflow-y-auto p-1">
+                                            {studentTasks.filter(t => t.name.toLowerCase().includes(studentTaskSearch.toLowerCase())).map(t => (
+                                                <div key={t.id} className="flex items-center gap-2 p-1.5 hover:bg-accent rounded-sm cursor-pointer" onClick={() => {
+                                                    setStudentSelectedTaskIds(prev => prev.includes(t.id.toString()) ? prev.filter(id => id !== t.id.toString()) : [...prev, t.id.toString()]);
+                                                    setStudentDownloadedPaths([]);
+                                                }}>
+                                                    <div className={`w-4 h-4 border rounded-sm flex items-center justify-center ${studentSelectedTaskIds.includes(t.id.toString()) ? 'bg-primary border-primary' : 'border-input'}`}>
+                                                        {studentSelectedTaskIds.includes(t.id.toString()) && <CheckCircle className="w-3 h-3 text-primary-foreground" />}
+                                                    </div>
+                                                    <span className="text-xs truncate">{t.name} (ID: {t.id})</span>
+                                                </div>
+                                            ))}
+                                            {studentTasks.filter(t => t.name.toLowerCase().includes(studentTaskSearch.toLowerCase())).length === 0 && (
+                                                <div className="p-2 text-xs text-muted-foreground text-center">No tasks found.</div>
+                                            )}
+                                        </div>
+                                        <div className="p-2 border-t flex justify-end gap-2">
+                                             <Button variant="ghost" size="sm" className="h-6 text-[10px]" onClick={(e) => { e.stopPropagation(); setStudentSelectedTaskIds([]); setStudentDownloadedPaths([]); }}>Clear</Button>
+                                             <Button variant="outline" size="sm" className="h-6 text-[10px]" onClick={(e) => { e.stopPropagation(); setStudentSelectedTaskIds(studentTasks.map(t => t.id.toString())); setStudentDownloadedPaths([]); }}>Select All</Button>
+                                        </div>
                                     </SelectContent>
                                 </Select>
                             </div>

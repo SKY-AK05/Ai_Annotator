@@ -4,7 +4,7 @@ import { downloadQueue } from '@/lib/queue';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { cvatProjectId, cvatApiUrl, cvatApiKey, type } = body;
+        const { cvatProjectId, cvatApiUrl, cvatApiKey, type, taskIds } = body;
 
         if (!cvatProjectId || !cvatApiUrl || !cvatApiKey || !type) {
             return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
@@ -14,7 +14,8 @@ export async function POST(request: Request) {
             cvatProjectId,
             cvatApiUrl,
             cvatApiKey,
-            type
+            type,
+            taskIds
         });
 
         return NextResponse.json({ jobId: job.id });

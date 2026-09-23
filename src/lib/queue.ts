@@ -43,11 +43,12 @@ export interface DownloadJobData {
     cvatApiUrl: string;
     cvatApiKey: string;
     type: 'gt' | 'student';
+    taskIds?: string[];
 }
 
 export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('DownloadQueue', async (job) => {
     const data = job.data as DownloadJobData;
-    const { cvatProjectId, cvatApiUrl, cvatApiKey } = data;
+    const { cvatProjectId, cvatApiUrl, cvatApiKey, taskIds } = data;
     
     const JSZip = (await import('jszip')).default;
     const downloadedFiles: { name: string, content: string, extractedImages: {name: string, url: string}[] }[] = [];
@@ -56,110 +57,118 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
         throw new Error("Missing cvatProjectId in download job");
     }
 
-    await job.updateProgress(10);
-    
-    // 1. Trigger export
-    const exportUrl = `${cvatApiUrl}/api/projects/${cvatProjectId}/dataset/export`;
-    const exportRes = await fetch(`${exportUrl}?format=CVAT%20for%20images%201.1&save_images=true`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${cvatApiKey}` }
-    });
-    
-    if (!exportRes.ok) {
-        throw new Error(`CVAT API Export Error for Project ${cvatProjectId}: ${exportRes.statusText} - ${await exportRes.text()}`);
-    }
-    
-    const exportData = await exportRes.json().catch(() => ({}));
-    const rq_id = exportData.rq_id;
-    
-    if (!rq_id) {
-        throw new Error(`No rq_id returned from export request for project ${cvatProjectId}.`);
-    }
-    
-    // 2. Poll for completion
-    let result_url = null;
-    let attempts = 0;
-    while (attempts < 60) {
-        await job.updateProgress(10 + Math.min(80, attempts * 2));
+    const itemsToExport = taskIds && taskIds.length > 0 
+        ? taskIds.map(id => ({ type: 'task', id, urlPath: `/api/tasks/${id}` }))
+        : [{ type: 'project', id: cvatProjectId, urlPath: `/api/projects/${cvatProjectId}` }];
+
+    for (let i = 0; i < itemsToExport.length; i++) {
+        const item = itemsToExport[i];
+        const baseProgress = (i / itemsToExport.length) * 100;
+        const nextProgress = ((i + 1) / itemsToExport.length) * 100;
         
-        const statusRes = await fetch(`${cvatApiUrl}/api/requests/${rq_id}`, {
+        await job.updateProgress(Math.floor(baseProgress + 5));
+        
+        // 1. Trigger export
+        const exportUrl = `${cvatApiUrl}${item.urlPath}/dataset/export`;
+        const exportRes = await fetch(`${exportUrl}?format=CVAT%20for%20images%201.1&save_images=true`, {
+            method: 'POST',
             headers: { 'Authorization': `Bearer ${cvatApiKey}` }
         });
         
-        if (!statusRes.ok) {
-            throw new Error(`Failed to check status for request ${rq_id}: ${statusRes.statusText}`);
+        if (!exportRes.ok) {
+            throw new Error(`CVAT API Export Error for ${item.type} ${item.id}: ${exportRes.statusText} - ${await exportRes.text()}`);
         }
         
-        const statusData = await statusRes.json();
-        const status = statusData.status;
+        const exportData = await exportRes.json().catch(() => ({}));
+        const rq_id = exportData.rq_id;
         
-        if (status === 'finished') {
-            result_url = statusData.result_url;
-            if (!result_url) {
-                throw new Error(`Finished but no result_url in response: ${JSON.stringify(statusData)}`);
-            }
-            break;
-        } else if (status === 'failed') {
-            throw new Error(`Export failed: ${statusData.message || JSON.stringify(statusData)}`);
+        if (!rq_id) {
+            throw new Error(`No rq_id returned from export request for ${item.type} ${item.id}.`);
         }
         
-        await new Promise(r => setTimeout(r, 5000));
-        attempts++;
-    }
-    
-    if (!result_url) {
-        throw new Error(`Timed out waiting for CVAT Project ${cvatProjectId} annotations export.`);
-    }
-
-    // 3. Download the ZIP file
-    await job.updateProgress(90);
-    const full_url = result_url.startsWith('http') ? result_url : `${cvatApiUrl}${result_url}`;
-    
-    const dlRes = await fetch(full_url, {
-        headers: { 'Authorization': `Bearer ${cvatApiKey}` }
-    });
-    
-    if (!dlRes.ok) {
-        throw new Error(`Failed to download result zip: ${dlRes.statusText}`);
-    }
-    
-    const fileBuffer = await dlRes.arrayBuffer();
-
-    // 4. Extract Zip
-    const zip = await JSZip.loadAsync(fileBuffer);
-    let content: string | null = null;
-    const extractedImages: {name: string, url: string}[] = [];
-    
-    const jobImagesDir = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), `Project_${cvatProjectId}`);
-    await fs.mkdir(jobImagesDir, { recursive: true });
-    
-    for (const filename in zip.files) {
-        if (filename.endsWith('.json') || filename.endsWith('.xml')) {
-            content = await zip.files[filename].async('string');
-        } else if (!zip.files[filename].dir && filename.match(/\.(jpe?g|png|gif|webp)$/i)) {
-            const imageBuffer = await zip.files[filename].async('nodebuffer');
-            // Flatten the directory structure for the saved file to avoid creating deep directories,
-            // but keep the full filename in the extractedImages metadata for matching later.
-            const safeDestName = filename.replace(/[\/\\]/g, '_');
-            const destPath = path.join(jobImagesDir, safeDestName);
-            await fs.writeFile(destPath, imageBuffer);
+        // 2. Poll for completion
+        let result_url = null;
+        let attempts = 0;
+        while (attempts < 60) {
+            await job.updateProgress(Math.floor(baseProgress + 5 + Math.min(80, attempts * 2) * (nextProgress - baseProgress) / 100));
             
-            extractedImages.push({
-                name: filename, // Original zip path (e.g. 'images/default/Task1/img.jpg')
-                url: `/cvat-images/${job.id}/Project_${cvatProjectId}/${safeDestName}`
+            const statusRes = await fetch(`${cvatApiUrl}/api/requests/${rq_id}`, {
+                headers: { 'Authorization': `Bearer ${cvatApiKey}` }
             });
+            
+            if (!statusRes.ok) {
+                throw new Error(`Failed to check status for request ${rq_id}: ${statusRes.statusText}`);
+            }
+            
+            const statusData = await statusRes.json();
+            const status = statusData.status;
+            
+            if (status === 'finished') {
+                result_url = statusData.result_url;
+                if (!result_url) {
+                    throw new Error(`Finished but no result_url in response: ${JSON.stringify(statusData)}`);
+                }
+                break;
+            } else if (status === 'failed') {
+                throw new Error(`Export failed: ${statusData.message || JSON.stringify(statusData)}`);
+            }
+            
+            await new Promise(r => setTimeout(r, 5000));
+            attempts++;
         }
+        
+        if (!result_url) {
+            throw new Error(`Timed out waiting for CVAT ${item.type} ${item.id} annotations export.`);
+        }
+
+        // 3. Download the ZIP file
+        await job.updateProgress(Math.floor(baseProgress + 90 * (nextProgress - baseProgress) / 100));
+        const full_url = result_url.startsWith('http') ? result_url : `${cvatApiUrl}${result_url}`;
+        
+        const dlRes = await fetch(full_url, {
+            headers: { 'Authorization': `Bearer ${cvatApiKey}` }
+        });
+        
+        if (!dlRes.ok) {
+            throw new Error(`Failed to download result zip: ${dlRes.statusText}`);
+        }
+        
+        const fileBuffer = await dlRes.arrayBuffer();
+
+        // 4. Extract Zip
+        const zip = await JSZip.loadAsync(fileBuffer);
+        let content: string | null = null;
+        const extractedImages: {name: string, url: string}[] = [];
+        
+        const jobImagesDir = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), `${item.type}_${item.id}`);
+        await fs.mkdir(jobImagesDir, { recursive: true });
+        
+        for (const filename in zip.files) {
+            if (filename.endsWith('.json') || filename.endsWith('.xml')) {
+                content = await zip.files[filename].async('string');
+            } else if (!zip.files[filename].dir && filename.match(/\.(jpe?g|png|gif|webp)$/i)) {
+                const imageBuffer = await zip.files[filename].async('nodebuffer');
+                const safeDestName = filename.replace(/[\/\]/g, '_');
+                const destPath = path.join(jobImagesDir, safeDestName);
+                await fs.writeFile(destPath, imageBuffer);
+                
+                extractedImages.push({
+                    name: filename,
+                    url: `/cvat-images/${job.id}/${item.type}_${item.id}/${safeDestName}`
+                });
+            }
+        }
+        
+        if (!content) {
+            throw new Error(`Could not find an annotation file in the export for ${item.type} ${item.id}.`);
+        }
+        
+        downloadedFiles.push({ 
+            name: `${item.type}_${item.id}`, 
+            content,
+            extractedImages
+        });
     }
-    
-    if (!content) {
-        throw new Error(`Could not find an annotation file in the export for Project ${cvatProjectId}.`);
-    }
-    
-    downloadedFiles.push({ 
-        name: `Project_${cvatProjectId}`, 
-        content,
-        extractedImages
-    });
 
     // Save metadata to disk instead of returning all strings in memory
     const manifestPath = path.join(process.cwd(), 'public', 'cvat-images', String(job.id), 'manifest.json');
