@@ -148,7 +148,7 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
                 content = await zip.files[filename].async('string');
             } else if (!zip.files[filename].dir && filename.match(/\.(jpe?g|png|gif|webp)$/i)) {
                 const imageBuffer = await zip.files[filename].async('nodebuffer');
-                const safeDestName = filename.replace(/[\/\]/g, '_');
+                const safeDestName = filename.replace(/[\\\\/]/g, '_');
                 const destPath = path.join(jobImagesDir, safeDestName);
                 await fs.writeFile(destPath, imageBuffer);
                 
