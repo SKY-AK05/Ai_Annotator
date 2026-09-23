@@ -242,7 +242,7 @@ export default function Home() {
         const manifestIndex = pathParts.indexOf('manifest.json');
         let manifestUrl = '';
         if (manifestIndex >= 2) {
-            manifestUrl = `/cvat-images/${pathParts[manifestIndex - 1]}/manifest.json`;
+            manifestUrl = `/cvat-data/${pathParts[manifestIndex - 1]}/manifest.json`;
         }
 
         const manifestRes = await fetch('/api/pull-data/read-manifest', {
@@ -331,7 +331,7 @@ export default function Home() {
                 const manifestIndex = pathParts.indexOf('manifest.json');
                 let manifestUrl = '';
                 if (manifestIndex >= 2) {
-                    manifestUrl = `/cvat-images/${pathParts[manifestIndex - 1]}/manifest.json`;
+                    manifestUrl = `/cvat-data/${pathParts[manifestIndex - 1]}/manifest.json`;
                 }
 
                 const manifestRes = await fetch('/api/pull-data/read-manifest', {

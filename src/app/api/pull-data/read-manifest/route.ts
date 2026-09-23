@@ -17,7 +17,7 @@ export async function POST(request: Request) {
             targetPath = path.join(process.cwd(), 'public', relativeUrl);
         } else {
             targetPath = path.normalize(manifestPath);
-            const expectedDir = path.normalize(path.join(process.cwd(), 'public', 'cvat-images')).toLowerCase();
+            const expectedDir = path.normalize(path.join(process.cwd(), 'public', 'cvat-data')).toLowerCase();
             if (!targetPath.toLowerCase().startsWith(expectedDir)) {
                 return NextResponse.json({ error: 'Invalid manifest path' }, { status: 403 });
             }
