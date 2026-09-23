@@ -1,52 +1,27 @@
-import { Queue, Worker } from 'bullmq';
-import { evaluateAnnotations, recalculateOverallScore } from './evaluator';
-import { parseCvatXml } from './cvat-xml-parser';
-import { parseUniversalBboxDataset } from './universal-bbox-parser';
-import fs from 'fs/promises';
-import path from 'path';
-import type { CocoJson, EvalSchema, EvaluationResult, ScoreOverrides } from './types';
+import sys
 
-const connection = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-};
+queue_path = r"c:\Users\Aakash\Documents\PROJECT WEB\orchvate\AI_ANNOTATE\Ai_Annotator\src\lib\queue.ts"
+with open(queue_path, 'r', encoding='utf-8') as f:
+    content = f.read()
 
-// Singleton pattern for Next.js dev environment to avoid duplicate queues/workers
-const globalForBullMQ = global as unknown as {
-    evaluationQueue?: Queue;
-    evaluationWorker?: Worker;
-    downloadQueue?: Queue;
-    downloadWorker?: Worker;
-};
+# I need to completely replace downloadWorker and evaluationWorker.
+# Let's locate downloadWorker:
+start_idx = content.find("export const downloadWorker =")
+if start_idx == -1:
+    print("Could not find downloadWorker")
+    sys.exit(1)
 
-export const evaluationQueue = globalForBullMQ.evaluationQueue || new Queue('EvaluationQueue', { connection });
-if (process.env.NODE_ENV !== 'production') globalForBullMQ.evaluationQueue = evaluationQueue;
+end_idx = content.find("if (process.env.NODE_ENV !== 'production') globalForBullMQ.downloadWorker = downloadWorker;")
+end_idx = content.find("\n", end_idx) + 1
 
-export const downloadQueue = globalForBullMQ.downloadQueue || new Queue('DownloadQueue', { connection });
-if (process.env.NODE_ENV !== 'production') globalForBullMQ.downloadQueue = downloadQueue;
+end_eval_idx = content.find("if (process.env.NODE_ENV !== 'production') globalForBullMQ.evaluationWorker = evaluationWorker;")
+end_eval_idx = content.find("\n", end_eval_idx) + 1
 
-export interface EvaluationJobData {
-    gtFileContent: string;
-    evalSchema: EvalSchema;
-    toolType: string;
-    scoreOverrides: ScoreOverrides;
-    cvatTaskIds: string;
-    cvatApiUrl: string;
-    cvatApiKey: string;
-    extractedStudentFiles?: { name: string, content: string }[];
-    gtDownloadedPath?: string;
-    studentDownloadedPaths?: string[];
-}
+if end_eval_idx == 0: # handle different formats
+    print("Could not find end of evaluationWorker")
+    sys.exit(1)
 
-export interface DownloadJobData {
-    cvatProjectId: string;
-    cvatApiUrl: string;
-    cvatApiKey: string;
-    type: 'gt' | 'student';
-    taskIds?: string[];
-}
-
-export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('DownloadQueue', async (job) => {
+new_workers = """export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('DownloadQueue', async (job) => {
     const data = job.data as DownloadJobData;
     const { cvatProjectId, cvatApiUrl, cvatApiKey, taskIds, type } = data;
     
@@ -197,7 +172,7 @@ export const downloadWorker = globalForBullMQ.downloadWorker || new Worker('Down
             name: safeName, 
             xmlPath,
             imagesDir,
-            imagesUrlBase: `/cvat-data/${job.id}/${subPath.replace(/\\/g, '/')}/images`
+            imagesUrlBase: `/cvat-data/${job.id}/${subPath.replace(/\\\\/g, '/')}/images`
         });
     }
 
@@ -355,12 +330,11 @@ export const evaluationWorker = globalForBullMQ.evaluationWorker || new Worker('
     return batchResults;
 }, { connection, concurrency: 4 });
 if (process.env.NODE_ENV !== 'production') globalForBullMQ.evaluationWorker = evaluationWorker;
+"""
 
-// Handle worker events for logging
-evaluationWorker.on('completed', job => {
-  console.log(`${job.id} has completed!`);
-});
+new_content = content[:start_idx] + new_workers + content[end_eval_idx:]
 
-evaluationWorker.on('failed', (job, err) => {
-  console.log(`${job?.id} has failed with ${err.message}`);
-});
+with open(queue_path, 'w', encoding='utf-8') as f:
+    f.write(new_content)
+
+print("Done")
