@@ -321,53 +321,54 @@ export default function Home() {
         let currentGtContent = gtFileContent;
         let currentEvalSchema = evalSchema;
 
-        // If GT is from API and we have downloaded it
+        // If GT is from API and we have a downloaded manifest path, always load from it
         if (data.gtSourceMode === 'api' && data.gtDownloadedPath) {
-            if (loadedGtSourceId !== data.gtDownloadedPath) {
-                // If they haven't clicked Generate Rules, we need to do it here as a fallback
-                toast({ title: "Fetching Ground Truth...", description: "Reading downloaded GT annotations." });
-                
-                const pathParts = data.gtDownloadedPath.replace(/\\/g, '/').split('/');
-                const manifestIndex = pathParts.indexOf('manifest.json');
-                let manifestUrl = '';
-                if (manifestIndex >= 2) {
-                    manifestUrl = `/cvat-data/${pathParts[manifestIndex - 1]}/manifest.json`;
-                }
+            toast({ title: "Fetching Ground Truth...", description: "Reading downloaded GT annotations." });
 
-                const manifestRes = await fetch('/api/pull-data/read-manifest', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ manifestUrl: manifestUrl || undefined, manifestPath: data.gtDownloadedPath })
-                });
-                if (!manifestRes.ok) {
-                    const errData = await manifestRes.json().catch(() => ({}));
-                    throw new Error(`Failed to fetch downloaded GT manifest. ${errData.error || 'Check server logs.'}`);
-                }
-                const manifestData = await manifestRes.json();
-                const manifest = manifestData.manifest;
-                
-                if (manifest && manifest.length > 0) {
-                    currentGtContent = manifest[0].content;
-                    setGtFileContent(currentGtContent);
-                    
-                    // Generate Schema
-                    toast({ title: "Generating Rules...", description: "Extracting evaluation schema from GT." });
-                    const formData = new FormData();
-                    if (currentGtContent) formData.append('gtFileContent', currentGtContent);
-                    const schemaRes = await fetch('/api/schema', { method: 'POST', body: formData });
-                    if (!schemaRes.ok) {
-                        const errData = await schemaRes.json();
-                        throw new Error(errData.error || 'Failed to extract schema');
-                    }
-                    const schemaData = await schemaRes.json();
-                    currentEvalSchema = schemaData.schema;
-                    setEvalSchema(currentEvalSchema);
-                    setLoadedGtSourceId(data.gtDownloadedPath);
-                } else {
-                    throw new Error("GT Manifest is empty.");
-                }
+            const manifestRes = await fetch('/api/pull-data/read-manifest', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ manifestPath: data.gtDownloadedPath })
+            });
+            if (!manifestRes.ok) {
+                const errData = await manifestRes.json().catch(() => ({}));
+                throw new Error(`Failed to read GT manifest: ${errData.error || manifestRes.statusText}. Please check file formats and try again.`);
             }
-        } else if (data.gtSourceMode === 'file' && loadedGtSourceId !== 'file') {
+            const manifestData = await manifestRes.json();
+            const manifest = manifestData.manifest;
+            
+            if (!manifest || manifest.length === 0) {
+                throw new Error("GT Manifest is empty. Please re-pull your GT data.");
+            }
+
+            currentGtContent = manifest[0].content;
+            setGtFileContent(currentGtContent);
+
+            // Extract images
+            const newGtImageUrls = new Map<string, string>();
+            if (manifest[0].extractedImages) {
+                manifest[0].extractedImages.forEach((img: {name: string, url: string}) => {
+                    newGtImageUrls.set(img.name, img.url);
+                });
+            }
+            setImageUrls(newGtImageUrls);
+
+            // If we don't have an evalSchema yet, generate it from the GT
+            if (!currentEvalSchema || loadedGtSourceId !== data.gtDownloadedPath) {
+                toast({ title: "Generating Rules...", description: "Sending GT to AI to extract evaluation rules." });
+                const schemaForm = new FormData();
+                schemaForm.append('gtFileContent', currentGtContent || '');
+                const schemaRes = await fetch('/api/schema', { method: 'POST', body: schemaForm });
+                if (!schemaRes.ok) {
+                    const errData = await schemaRes.json();
+                    throw new Error(errData.error || 'Failed to extract schema from GT.');
+                }
+                const schemaData = await schemaRes.json();
+                currentEvalSchema = schemaData.schema;
+                setEvalSchema(currentEvalSchema);
+                setLoadedGtSourceId(data.gtDownloadedPath);
+            }
+        } else if (data.gtSourceMode === 'file') {
              if (!currentEvalSchema || !currentGtContent) {
                 throw new Error("Please upload a Ground Truth file first to generate rules.");
              }
@@ -375,7 +376,7 @@ export default function Home() {
         }
 
         if (!currentEvalSchema || !currentGtContent) {
-            throw new Error("Missing Ground Truth data or Evaluation Rules.");
+            throw new Error("Ground Truth file or content is required. Please pull or upload GT data first.");
         }
   
         const imageFileInputs = data.imageFiles ? Array.from(data.imageFiles) : [];
@@ -417,7 +418,7 @@ export default function Home() {
         setImageUrls(newImageUrls);
 
         const formData = new FormData();
-        formData.append('gtFileContent', currentGtContent);
+        if (currentGtContent) formData.append('gtFileContent', currentGtContent);
         formData.append('evalSchema', JSON.stringify(currentEvalSchema));
         formData.append('toolType', data.toolType);
         formData.append('scoreOverrides', JSON.stringify(scoreOverrides));
